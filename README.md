@@ -2,6 +2,7 @@
 
 [![GitHub Release](https://img.shields.io/github/v/release/jfreed-dev/turing-rk1-cluster)](https://github.com/jfreed-dev/turing-rk1-cluster/releases)
 [![Lint](https://github.com/jfreed-dev/turing-rk1-cluster/actions/workflows/lint.yml/badge.svg)](https://github.com/jfreed-dev/turing-rk1-cluster/actions/workflows/lint.yml)
+[![CodeQL](https://github.com/jfreed-dev/turing-rk1-cluster/actions/workflows/codeql.yml/badge.svg)](https://github.com/jfreed-dev/turing-rk1-cluster/actions/workflows/codeql.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Talos](https://img.shields.io/badge/Talos-v1.11.6-blue)](https://www.talos.dev/)
 [![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.34.1-326CE5?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
