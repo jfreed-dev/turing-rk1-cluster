@@ -1,0 +1,114 @@
+version: v1alpha1
+debug: false
+persist: true
+machine:
+    type: controlplane
+    token: <REDACTED>
+    ca:
+        crt: <REDACTED>
+        key: <REDACTED>
+    certSANs: []
+    kubelet:
+        image: ghcr.io/siderolabs/kubelet:v1.34.1
+        extraMounts:
+            - destination: /var/lib/longhorn
+              type: bind
+              source: /var/lib/longhorn
+              options:
+                - bind
+                - rshared
+                - rw
+        defaultRuntimeSeccompProfileEnabled: true
+        disableManifestsDirectory: true
+    network:
+        hostname: turing-cp1
+        interfaces:
+            - interface: eth0
+              dhcp: true
+    disks:
+        - device: /dev/nvme0n1
+          partitions:
+            - mountpoint: /var/lib/longhorn
+    install:
+        disk: /dev/mmcblk0
+        image: ghcr.io/siderolabs/installer:v1.11.6
+        wipe: false
+    features:
+        rbac: true
+        stableHostname: true
+        apidCheckExtKeyUsage: true
+        diskQuotaSupport: true
+        kubePrism:
+            enabled: true
+            port: 7445
+        hostDNS:
+            enabled: true
+            forwardKubeDNSToHost: true
+    nodeLabels:
+        node.kubernetes.io/exclude-from-external-load-balancers: ""
+cluster:
+    id: <REDACTED>
+    secret: <REDACTED>
+    controlPlane:
+        endpoint: https://10.10.88.73:6443
+    clusterName: turing-cluster
+    network:
+        dnsDomain: cluster.local
+        podSubnets:
+            - 10.244.0.0/16
+        serviceSubnets:
+            - 10.96.0.0/12
+    token: <REDACTED>
+    secretboxEncryptionSecret: <REDACTED>
+    ca:
+        crt: <REDACTED>
+        key: <REDACTED>
+    aggregatorCA:
+        crt: <REDACTED>
+        key: <REDACTED>
+    serviceAccount:
+        key: <REDACTED>
+    apiServer:
+        image: registry.k8s.io/kube-apiserver:v1.34.1
+        certSANs:
+            - 10.10.88.73
+        disablePodSecurityPolicy: true
+        admissionControl:
+            - name: PodSecurity
+              configuration:
+                apiVersion: pod-security.admission.config.k8s.io/v1alpha1
+                defaults:
+                    audit: restricted
+                    audit-version: latest
+                    enforce: baseline
+                    enforce-version: latest
+                    warn: restricted
+                    warn-version: latest
+                exemptions:
+                    namespaces:
+                        - kube-system
+                    runtimeClasses: []
+                    usernames: []
+                kind: PodSecurityConfiguration
+        auditPolicy:
+            apiVersion: audit.k8s.io/v1
+            kind: Policy
+            rules:
+                - level: Metadata
+    controllerManager:
+        image: registry.k8s.io/kube-controller-manager:v1.34.1
+    proxy:
+        image: registry.k8s.io/kube-proxy:v1.34.1
+    scheduler:
+        image: registry.k8s.io/kube-scheduler:v1.34.1
+    discovery:
+        enabled: true
+        registries:
+            kubernetes:
+                disabled: true
+            service: {}
+    etcd:
+        ca:
+            crt: <REDACTED>
+            key: <REDACTED>
+    allowSchedulingOnControlPlanes: true

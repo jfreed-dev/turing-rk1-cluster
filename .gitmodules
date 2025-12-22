@@ -1,0 +1,15 @@
+[submodule "repo/rknn-llm"]
+	path = repo/rknn-llm
+	url = https://github.com/airockchip/rknn-llm.git
+[submodule "repo/rknn-toolkit2"]
+	path = repo/rknn-toolkit2
+	url = https://github.com/airockchip/rknn-toolkit2.git
+[submodule "repo/rknn_model_zoo"]
+	path = repo/rknn_model_zoo
+	url = https://github.com/airockchip/rknn_model_zoo.git
+[submodule "repo/sbc-rockchip"]
+	path = repo/sbc-rockchip
+	url = https://github.com/siderolabs/sbc-rockchip.git
+[submodule "repo/u-boot-rockchip"]
+	path = repo/u-boot-rockchip
+	url = https://gitlab.denx.de/u-boot/custodians/u-boot-rockchip.git

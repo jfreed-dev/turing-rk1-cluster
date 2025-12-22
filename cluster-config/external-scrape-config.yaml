@@ -1,0 +1,63 @@
+---
+# External Scrape Configuration for Docker Hosts
+# Update the target IPs to match your Docker servers
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: additional-scrape-configs
+  namespace: monitoring
+  labels:
+    app: prometheus
+stringData:
+  additional-scrape-configs.yaml: |
+    # Docker daemon metrics (requires Docker metrics endpoint enabled)
+    - job_name: 'docker-daemon'
+      static_configs:
+        - targets:
+          # Add your Docker host IPs here with port 9323
+          # Example:
+          # - '192.168.1.100:9323'
+          # - '192.168.1.101:9323'
+          labels:
+            source: 'docker-daemon'
+      metrics_path: /metrics
+      scheme: http
+
+    # cAdvisor for container metrics on Docker hosts
+    - job_name: 'docker-cadvisor'
+      static_configs:
+        - targets:
+          # Add your Docker host IPs here with cAdvisor port (default 8080)
+          # Example:
+          # - '192.168.1.100:8080'
+          # - '192.168.1.101:8080'
+          labels:
+            source: 'cadvisor'
+      metrics_path: /metrics
+      scheme: http
+
+    # Node Exporter on Docker hosts for system metrics
+    - job_name: 'docker-nodes'
+      static_configs:
+        - targets:
+          # Add your Docker host IPs here with node_exporter port (default 9100)
+          # Example:
+          # - '192.168.1.100:9100'
+          # - '192.168.1.101:9100'
+          labels:
+            source: 'node-exporter'
+      metrics_path: /metrics
+      scheme: http
+
+    # Portainer metrics (if using Portainer with metrics enabled)
+    - job_name: 'portainer'
+      static_configs:
+        - targets:
+          # Add your Portainer server IP with metrics port
+          # Example:
+          # - '192.168.1.100:9000'
+          labels:
+            source: 'portainer'
+      metrics_path: /api/system/metrics
+      scheme: http
