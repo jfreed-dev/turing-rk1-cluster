@@ -1,0 +1,10 @@
+apiVersion: v1alpha1
+kind: UserVolumeConfig
+name: longhorn-storage
+provisioning:
+  diskSelector:
+    match: disk.transport == "nvme"
+  minSize: 100GB
+  maxSize: 500GB
+filesystem:
+  type: ext4

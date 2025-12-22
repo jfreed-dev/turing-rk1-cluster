@@ -1,0 +1,49 @@
+# Sensitive files
+cluster-config/kubeconfig
+cluster-config/talosconfig
+cluster-config/secrets.yaml
+*.key
+*.pem
+
+# Large binary files
+images/**/*.raw
+*.rknn
+*.rkllm
+
+# AI assistant instruction files
+CLAUDE.md
+AGENT.md
+GEMINI.md
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Build artifacts
+build/
+dist/
+*.o
+*.a
+*.so
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+.venv/
+venv/
+
+# Logs
+*.log
+logs/

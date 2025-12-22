@@ -1,0 +1,162 @@
+---
+# ML Inference Demo - CPU-based image classification
+# Uses ONNX Runtime for ARM64 inference
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inference-script
+  namespace: default
+data:
+  inference.py: |
+    #!/usr/bin/env python3
+    """Simple ML inference demo using ONNX Runtime on ARM64"""
+    import sys
+    import subprocess
+
+    # Install dependencies first
+    print("Installing dependencies...")
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "numpy", "onnxruntime"])
+
+    import time
+    import urllib.request
+    import json
+    import numpy as np
+
+    def download_model():
+        """Download MobileNetV2 ONNX model"""
+        model_url = "https://github.com/onnx/models/raw/main/validated/vision/classification/mobilenet/model/mobilenetv2-12.onnx"
+        model_path = "/tmp/mobilenetv2.onnx"
+        print(f"Downloading MobileNetV2 model...")
+        try:
+            urllib.request.urlretrieve(model_url, model_path)
+            print(f"Model downloaded to {model_path}")
+            return model_path
+        except Exception as e:
+            print(f"Failed to download model: {e}")
+            return None
+
+    def load_labels():
+        """Load ImageNet labels"""
+        labels_url = "https://raw.githubusercontent.com/anishathalye/imagenet-simple-labels/master/imagenet-simple-labels.json"
+        try:
+            with urllib.request.urlopen(labels_url) as response:
+                labels = json.loads(response.read().decode())
+            return labels
+        except:
+            return [f"class_{i}" for i in range(1000)]
+
+    def run_inference():
+        """Run inference with random input"""
+        import onnxruntime as ort
+
+        model_path = download_model()
+        if not model_path:
+            print("Could not download model, using synthetic benchmark")
+            # Run synthetic benchmark
+            print("\n=== ARM64 Compute Benchmark ===")
+            start = time.time()
+            for _ in range(100):
+                a = np.random.randn(224, 224, 3).astype(np.float32)
+                b = np.random.randn(3, 3).astype(np.float32)
+                for _ in range(10):
+                    a = a * 1.001
+            elapsed = time.time() - start
+            print(f"100 iterations completed in {elapsed:.2f}s")
+            print(f"Throughput: {100/elapsed:.1f} ops/sec")
+            return
+
+        labels = load_labels()
+
+        # Create ONNX Runtime session
+        print(f"\nInitializing ONNX Runtime session...")
+        print(f"Available providers: {ort.get_available_providers()}")
+
+        session = ort.InferenceSession(model_path, providers=['CPUExecutionProvider'])
+
+        input_name = session.get_inputs()[0].name
+        input_shape = session.get_inputs()[0].shape
+        print(f"Input: {input_name}, shape: {input_shape}")
+
+        # Warmup
+        print("\nWarming up...")
+        dummy_input = np.random.randn(1, 3, 224, 224).astype(np.float32)
+        for _ in range(5):
+            session.run(None, {input_name: dummy_input})
+
+        # Benchmark
+        print("\n=== Running Inference Benchmark ===")
+        num_iterations = 50
+        times = []
+
+        for i in range(num_iterations):
+            input_data = np.random.randn(1, 3, 224, 224).astype(np.float32)
+            start = time.time()
+            outputs = session.run(None, {input_name: input_data})
+            elapsed = (time.time() - start) * 1000
+            times.append(elapsed)
+
+            if i == 0:
+                probs = outputs[0][0]
+                top5_idx = probs.argsort()[-5:][::-1]
+                print("\nSample prediction (random noise input):")
+                for idx in top5_idx:
+                    print(f"  {labels[idx]}: {probs[idx]:.4f}")
+
+        avg_time = np.mean(times)
+        std_time = np.std(times)
+        min_time = np.min(times)
+        max_time = np.max(times)
+
+        print(f"\n=== Benchmark Results ===")
+        print(f"Iterations: {num_iterations}")
+        print(f"Average latency: {avg_time:.2f} ms")
+        print(f"Std deviation: {std_time:.2f} ms")
+        print(f"Min latency: {min_time:.2f} ms")
+        print(f"Max latency: {max_time:.2f} ms")
+        print(f"Throughput: {1000/avg_time:.1f} inferences/sec")
+        print(f"\nModel: MobileNetV2 (ImageNet)")
+        print(f"Backend: ONNX Runtime CPU (ARM64)")
+        print(f"Platform: RK3588 Kubernetes Cluster")
+
+    if __name__ == "__main__":
+        print("=" * 50)
+        print("ML Inference Demo - ARM64 CPU")
+        print("=" * 50)
+        run_inference()
+        print("\n" + "=" * 50)
+        print("Demo complete!")
+        print("=" * 50)
+
+        # Keep pod running for logs inspection
+        print("\nKeeping pod running. Check logs with:")
+        print("kubectl logs -f ml-inference-demo")
+        time.sleep(3600)
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ml-inference-demo
+  namespace: default
+  labels:
+    app: ml-inference
+spec:
+  containers:
+  - name: inference
+    image: python:3.11-slim
+    command: ["python", "/scripts/inference.py"]
+    volumeMounts:
+    - name: script
+      mountPath: /scripts
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "1000m"
+      limits:
+        memory: "1Gi"
+        cpu: "4000m"
+  volumes:
+  - name: script
+    configMap:
+      name: inference-script
+  restartPolicy: Never

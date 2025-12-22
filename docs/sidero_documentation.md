@@ -1,0 +1,260 @@
+# Sidero Documentation
+
+## Docs
+
+- [Deploy Traefik as a Gateway API](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/deploy-traefik.md)
+- [Device Plugins](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/device-plugins.md): In this guide you will learn how to expose host devices to the Kubernetes pods.
+- [Dynamic Resource Allocation](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/dynamic-resource-allocation.md): Request and share node level resources among Kubernetes pods.
+- [Horizontal Pod Autoscaling](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/hpa.md)
+- [inlineManifests and extraManifests](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/inlinemanifests.md): Learn what inlineManifests and extraManifests are, how they differ, and why they matter.
+- [KubePrism](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/kubeprism.md): Enabling in-cluster highly-available controlplane endpoint.
+- [KubeRay](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/kuberay.md): Install Ray on Kubernetes.
+- [Kueue](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/kueue.md): Install Kueue on Kubernetes.
+- [Node Labels and Node Taints](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/node-labels.md): How to configure and use Kubernetes node labels and taints with Talos.
+- [Talos API access from Kubernetes](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/talos-api-access-from-k8s.md): How to access Talos API from within Kubernetes.
+- [Upgrading Kubernetes](https://docs.siderolabs.com/kubernetes-guides/advanced-guides/upgrading-kubernetes.md): Guide on how to upgrade the Kubernetes cluster from Talos Linux.
+- [Deploy Calico CNI](https://docs.siderolabs.com/kubernetes-guides/cni/deploy-calico.md): In this guide you will learn how to set up Calico CNI on Talos in two mode eBPF and NFtables.
+- [Deploy Cilium CNI](https://docs.siderolabs.com/kubernetes-guides/cni/deploying-cilium.md): In this guide you will learn how to set up Cilium CNI on Talos.
+- [Multus CNI](https://docs.siderolabs.com/kubernetes-guides/cni/multus.md): A brief instruction on howto use Multus on Talos Linux
+- [Ceph Storage Cluster with Rook](https://docs.siderolabs.com/kubernetes-guides/csi/ceph-with-rook.md): Guide on how to create a simple Ceph storage cluster with Rook for Kubernetes
+- [Local Storage](https://docs.siderolabs.com/kubernetes-guides/csi/local-storage.md): Using local storage for Kubernetes workloads.
+- [Storage](https://docs.siderolabs.com/kubernetes-guides/csi/storage.md): Setting up storage for a Kubernetes cluster
+- [iSCSI Storage with Synology CSI](https://docs.siderolabs.com/kubernetes-guides/csi/synology-csi.md): Automatically provision iSCSI volumes on a Synology NAS with the synology-csi driver.
+- [Deploying Metrics Server](https://docs.siderolabs.com/kubernetes-guides/monitoring-and-observability/deploy-metrics-server.md): In this guide you will learn how to set up metrics-server.
+- [Expose the Etcd Metrics Endpoint](https://docs.siderolabs.com/kubernetes-guides/monitoring-and-observability/etcd-metrics.md): Learn how to the expose etcd metrics endpoint.
+- [Kubernetes Guides Overview](https://docs.siderolabs.com/kubernetes-guides/overview/kubernetes-guides-overview.md)
+- [Pod Security](https://docs.siderolabs.com/kubernetes-guides/security/pod-security.md): Enabling Pod Security Admission plugin to configure Pod Security Standards.
+- [Seccomp Profiles](https://docs.siderolabs.com/kubernetes-guides/security/seccomp-profiles.md): Using custom Seccomp Profiles with Kubernetes workloads.
+- [User Namespaces](https://docs.siderolabs.com/kubernetes-guides/security/usernamespace.md): Guide on how to configure Talos Cluster to support User Namespaces
+- [Create a Hybrid Cluster](https://docs.siderolabs.com/omni/cluster-management/create-a-hybrid-cluster.md)
+- [Create Etcd Backups](https://docs.siderolabs.com/omni/cluster-management/etcd-backups.md)
+- [Export a Cluster Template from a Cluster Created in the UI](https://docs.siderolabs.com/omni/cluster-management/export-a-cluster-template-from-a-cluster-created-in-the-ui.md)
+- [Expose an HTTP Service from a Cluster](https://docs.siderolabs.com/omni/cluster-management/expose-an-http-service-from-a-cluster.md)
+- [Importing Talos Clusters](https://docs.siderolabs.com/omni/cluster-management/importing-talos-clusters.md)
+- [Override NTP servers](https://docs.siderolabs.com/omni/cluster-management/override-ntp-servers.md)
+- [Restore Etcd of a Cluster Managed by Cluster Templates](https://docs.siderolabs.com/omni/cluster-management/restore-etcd-of-a-cluster-managed-by-cluster-templates.md)
+- [Autoscale Your Cluster with Cluster AutoScaler](https://docs.siderolabs.com/omni/cluster-management/scale-your-cluster/cluster-autoscaler.md)
+- [Autoscale Your Talos Cluster on AWS with Karpenter](https://docs.siderolabs.com/omni/cluster-management/scale-your-cluster/karpenter.md)
+- [Scale a Cluster Up or Down](https://docs.siderolabs.com/omni/cluster-management/scale-your-cluster/scale-a-cluster-up-or-down.md)
+- [Support Bundle](https://docs.siderolabs.com/omni/cluster-management/support-bundle.md)
+- [Talos Config Overrides](https://docs.siderolabs.com/omni/cluster-management/talos-config-overrides.md)
+- [Upgrading Omni Clusters](https://docs.siderolabs.com/omni/cluster-management/upgrading-clusters.md)
+- [Audit logs](https://docs.siderolabs.com/omni/cluster-management/using-audit-log.md)
+- [Create a Cluster](https://docs.siderolabs.com/omni/getting-started/create-a-cluster.md)
+- [Getting Started with Omni](https://docs.siderolabs.com/omni/getting-started/getting-started.md)
+- [Install talosctl](https://docs.siderolabs.com/omni/getting-started/how-to-install-talosctl.md)
+- [Install and Configure Omnictl](https://docs.siderolabs.com/omni/getting-started/install-and-configure-omnictl.md)
+- [Omni Support Matrix](https://docs.siderolabs.com/omni/getting-started/support-matrix.md)
+- [Use Kubectl With Omni](https://docs.siderolabs.com/omni/getting-started/use-kubectl-with-omni.md)
+- [Infrastructure Providers](https://docs.siderolabs.com/omni/infrastructure-and-extensions/infrastructure-providers.md)
+- [Installing Airgapped Omni](https://docs.siderolabs.com/omni/infrastructure-and-extensions/install-airgapped-omni.md)
+- [Install Talos Linux Extensions](https://docs.siderolabs.com/omni/infrastructure-and-extensions/install-talos-linux-extensions.md)
+- [Machine Registration](https://docs.siderolabs.com/omni/infrastructure-and-extensions/machine-registration.md)
+- [Modify Kernel Arguments](https://docs.siderolabs.com/omni/infrastructure-and-extensions/modify-kernel-arguments.md)
+- [Configure Keycloak for Omni](https://docs.siderolabs.com/omni/infrastructure-and-extensions/self-hosted/configure-keycloak-for-omni.md)
+- [Deploy Omni on Prem](https://docs.siderolabs.com/omni/infrastructure-and-extensions/self-hosted/deploy-omni-on-prem.md)
+- [How to expose Omni with Nginx (HTTPS)](https://docs.siderolabs.com/omni/infrastructure-and-extensions/self-hosted/expose-omni-with-nginx-https.md)
+- [Back Up On-prem Omni Database](https://docs.siderolabs.com/omni/infrastructure-and-extensions/self-hosted/how-to-back-up-on-prem-omni-db.md)
+- [Run Image Factory On-prem](https://docs.siderolabs.com/omni/infrastructure-and-extensions/self-hosted/install-image-factory-on-prem.md)
+- [Omni Deployment Options](https://docs.siderolabs.com/omni/infrastructure-and-extensions/self-hosted/omni-deployment-options.md)
+- [Overview](https://docs.siderolabs.com/omni/infrastructure-and-extensions/self-hosted/overview.md)
+- [Write an Infrastructure Provider](https://docs.siderolabs.com/omni/infrastructure-and-extensions/writing-infrastructure-providers.md)
+- [Create a Kubeconfig for a Kubernetes Service Account](https://docs.siderolabs.com/omni/omni-cluster-setup/create-a-kubeconfig-for-a-service-account.md)
+- [Create a Machine Class](https://docs.siderolabs.com/omni/omni-cluster-setup/create-a-machine-class.md)
+- [Create a Patch For Cluster Machines](https://docs.siderolabs.com/omni/omni-cluster-setup/create-a-patch-for-cluster-machines.md)
+- [Create an Omni Service Account](https://docs.siderolabs.com/omni/omni-cluster-setup/create-an-omni-service-account.md)
+- [Set Initial Machine Labels Using Omnictl or Image Factory](https://docs.siderolabs.com/omni/omni-cluster-setup/how-to-set-initial-machine-labels.md)
+- [Register an AWS EC2 Instance](https://docs.siderolabs.com/omni/omni-cluster-setup/registering-machines/how-to-register-an-aws-ec2-instance.md)
+- [Join machines to Omni](https://docs.siderolabs.com/omni/omni-cluster-setup/registering-machines/join-machines-to-omni.md)
+- [Register a Bare Metal Machine (ISO)](https://docs.siderolabs.com/omni/omni-cluster-setup/registering-machines/register-a-bare-metal-machine-iso.md)
+- [Register a Bare Metal Machine (PXE/iPXE)](https://docs.siderolabs.com/omni/omni-cluster-setup/registering-machines/register-a-bare-metal-machine-pxe-ipxe.md)
+- [Register a GCP Instance](https://docs.siderolabs.com/omni/omni-cluster-setup/registering-machines/register-a-gcp-instance.md)
+- [Register a Hetzner Server](https://docs.siderolabs.com/omni/omni-cluster-setup/registering-machines/register-a-hetzner-server.md)
+- [Register an Azure Instance](https://docs.siderolabs.com/omni/omni-cluster-setup/registering-machines/register-an-azure-instance.md)
+- [Overview](https://docs.siderolabs.com/omni/omni-cluster-setup/registering-machines/register-machines-with-omni.md)
+- [Setting Up the Bare-Metal Infrastructure Provider](https://docs.siderolabs.com/omni/omni-cluster-setup/setting-up-the-bare-metal-infrastructure-provider.md)
+- [Omni Documentation](https://docs.siderolabs.com/omni/overview/what-is-omni.md)
+- [Access Policies (ACLs)](https://docs.siderolabs.com/omni/reference/acls.md)
+- [omnictl CLI](https://docs.siderolabs.com/omni/reference/cli.md)
+- [Cluster Templates](https://docs.siderolabs.com/omni/reference/cluster-templates.md)
+- [Generating omnictl CLI reference](https://docs.siderolabs.com/omni/reference/generating-omnictl-cli-reference.md)
+- [Authentication and Authorization](https://docs.siderolabs.com/omni/security-and-authentication/authentication-and-authorization.md)
+- [Break Glass Emergency Access](https://docs.siderolabs.com/omni/security-and-authentication/break-glass-emergency-access.md)
+- [Manage Access Policies (ACLs)](https://docs.siderolabs.com/omni/security-and-authentication/how-to-manage-acls.md)
+- [OIDC login with Tailscale](https://docs.siderolabs.com/omni/security-and-authentication/oidc-login-with-tailscale.md)
+- [Omni KMS Disk Encryption](https://docs.siderolabs.com/omni/security-and-authentication/omni-kms-disk-encryption.md)
+- [Rotate SideroLink Join Token](https://docs.siderolabs.com/omni/security-and-authentication/rotate-siderolink-join-token.md)
+- [Add a User to Omni with SAML Enabled](https://docs.siderolabs.com/omni/security-and-authentication/using-saml-with-omni/add-a-user-to-omni-with-saml-enabled.md)
+- [Auto-assign roles to SAML users](https://docs.siderolabs.com/omni/security-and-authentication/using-saml-with-omni/auto-assign-roles-to-saml-users.md)
+- [Configure Okta for Omni](https://docs.siderolabs.com/omni/security-and-authentication/using-saml-with-omni/configure-okta-for-omni.md)
+- [Using SAML and ACLs for fine-grained access control](https://docs.siderolabs.com/omni/security-and-authentication/using-saml-with-omni/configure-saml-and-acls.md)
+- [Configure Unifi Identity Enterprise for Omni](https://docs.siderolabs.com/omni/security-and-authentication/using-saml-with-omni/configure-unifi-identity-enterprise-for-omni.md)
+- [Configure Workspace ONE Access for Omni](https://docs.siderolabs.com/omni/security-and-authentication/using-saml-with-omni/configure-workspace-one-access-for-omni.md)
+- [Configure Entra ID AD for Omni](https://docs.siderolabs.com/omni/security-and-authentication/using-saml-with-omni/how-to-configure-entraid-for-omni.md)
+- [Overview](https://docs.siderolabs.com/omni/security-and-authentication/using-saml-with-omni/overview.md)
+- [SBOMs](https://docs.siderolabs.com/talos/v1.11/advanced-guides/SBOM.md): A guide on using Software Bill of Materials for Talos Linux.
+- [Install KubeVirt on Talos](https://docs.siderolabs.com/talos/v1.11/advanced-guides/install-kubevirt.md): This is a guide on how to get started with KubeVirt on Talos
+- [Migrating from Kubeadm](https://docs.siderolabs.com/talos/v1.11/advanced-guides/migrating-from-kubeadm.md)
+- [Cgroups Resource Analysis](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/cluster-operations-and-maintenance/cgroups-analysis.md): How to use `talosctl cgroups` to monitor resource usage on the node.
+- [Disaster Recovery](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/cluster-operations-and-maintenance/disaster-recovery.md): Procedure for snapshotting etcd database and recovering from catastrophic control plane failure.
+- [etcd Maintenance](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/cluster-operations-and-maintenance/etcd-maintenance.md): Operational instructions for etcd database.
+- [Watchdog Timers](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/cluster-operations-and-maintenance/watchdog.md): Using hardware watchdogs to workaround hardware/software lockups.
+- [Building Custom Talos Images](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/custom-images-and-development/building-images.md): How to build a custom Talos image from source.
+- [Customizing the Kernel](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/custom-images-and-development/customizing-the-kernel.md): Guide on how to customize the kernel used by Talos Linux.
+- [Developing Talos](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/custom-images-and-development/developing-talos.md): Learn how to set up a development environment for local testing and hacking on Talos itself!
+- [Extension Services](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/custom-images-and-development/extension-services.md): Use extension services in Talos Linux.
+- [Adding a Kernel Module](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/custom-images-and-development/kernel-module.md): Create a system extension that includes kernel modules.
+- [OCI Base Runtime Specification](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/custom-images-and-development/oci-base-spec.md): Adjusting OCI base runtime specification for CRI containers.
+- [Overlays](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/custom-images-and-development/overlays.md): Overlays
+- [System Extensions](https://docs.siderolabs.com/talos/v1.11/build-and-extend-talos/custom-images-and-development/system-extensions.md): Customizing the Talos Linux immutable root file system.
+- [AMD GPU Support (ROCm)](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/hardware-and-drivers/amd-gpu.md)
+- [NVIDIA Fabric Manager](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/hardware-and-drivers/nvidia-fabricmanager.md): In this guide we'll follow the procedure to enable NVIDIA Fabric Manager.
+- [NVIDIA GPU (OSS drivers)](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/hardware-and-drivers/nvidia-gpu.md): In this guide we'll follow the procedure to support NVIDIA GPU using OSS drivers on Talos.
+- [NVIDIA GPU (Proprietary drivers)](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/hardware-and-drivers/nvidia-gpu-proprietary.md): In this guide we'll follow the procedure to support NVIDIA GPU using proprietary drivers on Talos.
+- [Containerd](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/images-container-runtime/containerd.md): Customize Containerd Settings
+- [Image Cache](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/images-container-runtime/image-cache.md): How to enable and configure Talos image cache feature.
+- [Pull Through Image Cache](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/images-container-runtime/pull-through-cache.md): How to set up local transparent container images caches.
+- [Static Pods](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/images-container-runtime/static-pods.md): Using Talos Linux to set up static pods in Kubernetes.
+- [Resetting a Machine](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/lifecycle-management/resetting-a-machine.md): Steps on how to reset a Talos Linux machine to a clean state.
+- [Upgrading Talos Linux](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/lifecycle-management/upgrading-talos.md): Guide to upgrading a Talos Linux machine.
+- [Logging](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/logging-and-telemetry/logging.md): Dealing with Talos Linux logs.
+- [Disk Encryption](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-encryption.md): Guide on using disk encryption
+- [Common Configuration](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-management/common.md): Common elements of volume configuration.
+- [Existing Volumes](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-management/existing.md): Configuring existing volumes to mount migrated or pre-existing partitions and disks.
+- [Disk Layout](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-management/layout.md): Guide on disk layout, observing discovered disks and volumes.
+- [Overview](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-management/overview.md): Guide on managing disks
+- [Raw Volumes](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-management/raw.md): Configuring raw volumes to allocate unformatted storage.
+- [Resources](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-management/resources.md): Resources created by Talos Linux while processing volume configuration.
+- [System Volumes](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-management/system.md): Configuring Talos Linux system volumes, for example `EPHEMERAL` volume.
+- [User Volumes](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/disk-management/user.md): Configuring user volumes to allocate local storage for Kubernetes workloads.
+- [Swap](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/storage-and-disk-management/swap.md): Guide on managing swap devices and zswap configuration in Talos Linux.
+- [Discovery Service](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/system-configuration/discovery.md): Talos Linux Node discovery services
+- [Editing Machine Configuration](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/system-configuration/editing-machine-configuration.md): How to edit and patch Talos machine configuration, with reboot, immediately, or stage update on reboot.
+- [The insecure flag](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/system-configuration/insecure.md): Learn how to use the insecure flag.
+- [Configuration Patches](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/system-configuration/patching.md): In this guide, we'll patch the generated machine configuration.
+- [Performance Tuning](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/system-configuration/performance-tuning.md): In this guide, we'll describe various performance tuning knobs available.
+- [Reproducible Machine Configuration](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/system-configuration/reproducible-machine-configuration.md): How to reliably and consistently regenerate Talos machine configs from source inputs over time.
+- [Time Synchronization](https://docs.siderolabs.com/talos/v1.11/configure-your-talos-cluster/system-configuration/time-sync.md): Configuring time synchronization.
+- [Interactive Dashboard](https://docs.siderolabs.com/talos/v1.11/deploy-and-manage-workloads/interactive-dashboard.md): A tool to inspect the running Talos machine state on the physical video console.
+- [Scale down a Talos cluster](https://docs.siderolabs.com/talos/v1.11/deploy-and-manage-workloads/scaling-down.md): How to remove nodes from a Talos Linux cluster.
+- [Scale up a Talos cluster](https://docs.siderolabs.com/talos/v1.11/deploy-and-manage-workloads/scaling-up.md): How to add more nodes to a Talos Linux cluster.
+- [Enable workers on your control plane nodes](https://docs.siderolabs.com/talos/v1.11/deploy-and-manage-workloads/workers-on-controlplane.md): How to enable workers on your control plane nodes.
+- [Deploy Your First Workload to a Talos Cluster](https://docs.siderolabs.com/talos/v1.11/getting-started/deploy-first-workload.md): Deploy a sample workload to your Talos cluster to get started.
+- [Getting Started](https://docs.siderolabs.com/talos/v1.11/getting-started/getting-started.md): A guide to setting up a Talos cluster
+- [Production Clusters](https://docs.siderolabs.com/talos/v1.11/getting-started/prodnotes.md): Recommendations for setting up a Talos Linux cluster in production.
+- [Quickstart](https://docs.siderolabs.com/talos/v1.11/getting-started/quickstart.md): A short guide on setting up a simple Talos Linux cluster locally with Docker.
+- [Support Matrix](https://docs.siderolabs.com/talos/v1.11/getting-started/support-matrix.md): Table of supported Talos Linux versions and respective platforms.
+- [System Requirements](https://docs.siderolabs.com/talos/v1.11/getting-started/system-requirements.md): Hardware requirements for running Talos Linux.
+- [talosctl](https://docs.siderolabs.com/talos/v1.11/getting-started/talosctl.md): Install Talos Linux CLI
+- [What's New in Talos 1.11.0](https://docs.siderolabs.com/talos/v1.11/getting-started/what's-new-in-talos.md): Discover the latest features and updates in Talos Linux 1.11.
+- [Architecture](https://docs.siderolabs.com/talos/v1.11/learn-more/architecture.md): Learn the system architecture of Talos Linux itself.
+- [Components](https://docs.siderolabs.com/talos/v1.11/learn-more/components.md): Understand the system components that make up Talos Linux.
+- [Control Plane](https://docs.siderolabs.com/talos/v1.11/learn-more/control-plane.md): Understand the Kubernetes Control Plane.
+- [Controllers and Resources](https://docs.siderolabs.com/talos/v1.11/learn-more/controllers-resources.md): Discover how Talos Linux uses the concepts on Controllers and Resources.
+- [Image Factory](https://docs.siderolabs.com/talos/v1.11/learn-more/image-factory.md): Image Factory generates customized Talos Linux images based on configured schematics.
+- [Knowledge Base](https://docs.siderolabs.com/talos/v1.11/learn-more/knowledge-base.md): Recipes for common configuration tasks with Talos Linux.
+- [KubeSpan](https://docs.siderolabs.com/talos/v1.11/learn-more/kubespan.md): Understand more about KubeSpan for Talos Linux.
+- [Networking Resources](https://docs.siderolabs.com/talos/v1.11/learn-more/networking-resources.md): Delve deeper into networking of Talos Linux.
+- [Philosophy](https://docs.siderolabs.com/talos/v1.11/learn-more/philosophy.md): Learn about the philosophy behind the need for Talos Linux.
+- [Process Capabilities](https://docs.siderolabs.com/talos/v1.11/learn-more/process-capabilities.md): Understand the Linux process capabilities restrictions with Talos Linux.
+- [Network Connectivity](https://docs.siderolabs.com/talos/v1.11/learn-more/talos-network-connectivity.md): Description of the Networking Connectivity needed by Talos Linux
+- [talosctl](https://docs.siderolabs.com/talos/v1.11/learn-more/talosctl.md): The design and use of the Talos Linux control application.
+- [Advanced Networking](https://docs.siderolabs.com/talos/v1.11/networking/advanced-networking.md): How to configure advanced networking options on Talos Linux.
+- [Corporate Proxies](https://docs.siderolabs.com/talos/v1.11/networking/corporate-proxies.md): How to configure Talos Linux to use proxies in a corporate environment
+- [Network Device Selector](https://docs.siderolabs.com/talos/v1.11/networking/device-selector.md): How to configure network devices by selecting them using hardware information
+- [Egress Domains](https://docs.siderolabs.com/talos/v1.11/networking/egress-domains.md): Allowing outbound access for installing Talos
+- [Ethernet Configuration](https://docs.siderolabs.com/talos/v1.11/networking/ethernet-config.md): How to configure Ethernet network link settings.
+- [Host DNS](https://docs.siderolabs.com/talos/v1.11/networking/host-dns.md): How to configure Talos host DNS caching server.
+- [Ingress Firewall](https://docs.siderolabs.com/talos/v1.11/networking/ingress-firewall.md): Learn to use Talos Linux Ingress Firewall to limit access to the host services.
+- [KubeSpan](https://docs.siderolabs.com/talos/v1.11/networking/kubespan.md): Learn to use KubeSpan to connect Talos Linux machines securely across networks.
+- [Metal Network Configuration](https://docs.siderolabs.com/talos/v1.11/networking/metal-network-configuration.md): How to use `META`-based network configuration on Talos `metal` platform.
+- [Multihoming](https://docs.siderolabs.com/talos/v1.11/networking/multihoming.md): How to handle multihomed machines
+- [Predictable Interface Names](https://docs.siderolabs.com/talos/v1.11/networking/predictable-interface-names.md): How to use predictable interface naming.
+- [SideroLink](https://docs.siderolabs.com/talos/v1.11/networking/siderolink.md): Point-to-point management overlay Wireguard network.
+- [Virtual (shared) IP](https://docs.siderolabs.com/talos/v1.11/networking/vip.md): Using Talos Linux to set up a floating virtual IP address for cluster access.
+- [Wireguard Network](https://docs.siderolabs.com/talos/v1.11/networking/wireguard-network.md): A guide on how to set up Wireguard network using Kernel module.
+- [What is Talos Linux?](https://docs.siderolabs.com/talos/v1.11/overview/what-is-talos.md): Talos Linux is the best OS for Kubernetes.
+- [Air-gapped Environments](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/air-gapped.md): Setting up Talos Linux to work in environments with no internet access.
+- [Boot Loader](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/bare-metal-platforms/bootloader.md): Overview of the Talos boot process and boot loader configuration.
+- [Equinix Metal](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/bare-metal-platforms/equinix-metal.md): Creating Talos clusters with Equinix Metal.
+- [ISO](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/bare-metal-platforms/iso.md): Booting Talos on bare-metal with ISO.
+- [Matchbox](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/bare-metal-platforms/matchbox.md): In this guide we will create an HA Kubernetes cluster with 3 worker nodes using an existing load balancer and matchbox deployment.
+- [Network Configuration](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/bare-metal-platforms/network-config.md): In this guide we will describe how network can be configured on bare-metal platforms.
+- [PXE](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/bare-metal-platforms/pxe.md): Booting Talos over the network on bare-metal with PXE.
+- [SecureBoot](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/bare-metal-platforms/secureboot.md): Booting Talos in SecureBoot mode on UEFI platforms.
+- [Boot Assets](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/boot-assets.md): Creating customized Talos boot assets, disk images, ISO and installer images.
+- [Akamai](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/akamai.md): Creating a cluster via the CLI on Akamai Cloud (Linode).
+- [AWS](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/aws.md): Creating a cluster via the AWS CLI.
+- [Azure](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/azure.md): Creating a cluster via the CLI on Azure.
+- [CloudStack](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/cloudstack.md): Creating a cluster via the CLI (cmk) on Apache CloudStack.
+- [DigitalOcean](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/digitalocean.md): Creating a cluster via the CLI on DigitalOcean.
+- [Exoscale](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/exoscale.md): Creating a cluster via the CLI using exoscale.com
+- [GCP](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/gcp.md): Creating a cluster via the CLI on Google Cloud Platform.
+- [Hetzner](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/hetzner.md): Creating a cluster via the CLI (hcloud) on Hetzner.
+- [Kubernetes](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/kubernetes.md): Running Talos Linux as a pod in Kubernetes.
+- [Nocloud](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/nocloud.md): Configuring Talos networking via the `nocloud` specification.
+- [OpenStack](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/openstack.md): Creating a cluster via the CLI on OpenStack.
+- [Oracle](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/oracle.md): Creating a cluster via the CLI (oci) on OracleCloud.com.
+- [Scaleway](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/scaleway.md): Creating a single-instance cluster via the CLI (scw) on scaleway.com.
+- [UpCloud](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/upcloud.md): Creating a cluster via the CLI (upctl) on UpCloud.com.
+- [Vultr](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/cloud-platforms/vultr.md): Creating a cluster via the CLI (vultr-cli) on Vultr.com.
+- [Docker](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/local-platforms/docker.md): Creating Talos Kubernetes cluster using Docker.
+- [QEMU](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/local-platforms/qemu.md): Creating Talos Kubernetes cluster using QEMU VMs.
+- [VirtualBox](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/local-platforms/virtualbox.md): Creating Talos Kubernetes cluster using VirtualBox VMs.
+- [Omni SaaS](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/omni.md): Omni is a project created by the Talos team that has native support for Talos Linux.
+- [Banana Pi M64](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/bananapi_m64.md): Installing Talos on Banana Pi M64 SBC using raw disk image.
+- [Jetson Nano](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/jetson_nano.md): Installing Talos on Jetson Nano SBC using raw disk image.
+- [Libre Computer Board ALL-H3-CC](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/libretech_all_h3_cc_h5.md): Installing Talos on Libre Computer Board ALL-H3-CC SBC using raw disk image.
+- [Friendlyelec Nano PI R4S](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/nanopi_r4s.md): Installing Talos on a Nano PI R4S SBC using raw disk image.
+- [Orange Pi 5](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/orangepi_5.md): Installing Talos on Orange Pi 5 using raw disk image.
+- [Orange Pi R1 Plus LTS](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/orangepi_r1_plus_lts.md): Installing Talos on Orange Pi R1 Plus LTS SBC using raw disk image.
+- [Pine64](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/pine64.md): Installing Talos on a Pine64 SBC using raw disk image.
+- [Radxa ROCK 4C Plus](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/rock4cplus.md): Installing Talos on Radxa ROCK 4c Plus SBC using raw disk image.
+- [Radxa ROCK 5B](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/rock5b.md): Installing Talos on Radxa ROCK 5B SBC using raw disk image.
+- [Pine64 Rock64](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/rock64.md): Installing Talos on Pine64 Rock64 SBC using raw disk image.
+- [Radxa ROCK PI 4](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/rockpi_4.md): Installing Talos on Radxa ROCK PI 4a/4b SBC using raw disk image.
+- [Radxa ROCK PI 4C](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/rockpi_4c.md): Installing Talos on Radxa ROCK PI 4c SBC using raw disk image.
+- [Raspberry Pi Series](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/rpi_generic.md): Installing Talos on Raspberry Pi SBC's using raw disk image.
+- [Turing RK1](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/turing_rk1.md): Installing Talos on Turing RK1 SOM using raw disk image.
+- [Unofficial Ports](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/single-board-computers/unofficial.md): List of unofficial ports of Talos Linux to single-board computers.
+- [Hyper-V](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/virtualized-platforms/hyper-v.md): Creating a Talos Kubernetes cluster using Hyper-V.
+- [KVM](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/virtualized-platforms/kvm.md): Create a Talos Kubernetes cluster with KVM.
+- [OpenNebula](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/virtualized-platforms/opennebula.md)
+- [Proxmox](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/virtualized-platforms/proxmox.md): Creating Talos Kubernetes cluster using Proxmox.
+- [Vagrant & Libvirt](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/virtualized-platforms/vagrant-libvirt.md)
+- [VMware](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/virtualized-platforms/vmware.md): Creating Talos Kubernetes cluster using VMware.
+- [Xen](https://docs.siderolabs.com/talos/v1.11/platform-specific-installations/virtualized-platforms/xen.md)
+- [API](https://docs.siderolabs.com/talos/v1.11/reference/api.md): Talos gRPC API reference.
+- [talosctl](https://docs.siderolabs.com/talos/v1.11/reference/cli.md): Talosctl CLI tool reference.
+- [ExistingVolumeConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/block/existingvolumeconfig.md): ExistingVolumeConfig is an existing volume configuration document. Existing volumes allow to mount partitions (or whole disks) that were created outside of Talos. Volume will be mounted under `/var/mnt/<name>`. The existing volume config name should not conflict with user volume names.
+- [RawVolumeConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/block/rawvolumeconfig.md): RawVolumeConfig is a raw volume configuration document. Raw volumes allow to create partitions without formatting them. If you want to use local storage, user volumes is a better choice, raw volumes are intended to be used with CSI provisioners. The partition label is automatically generated as `r-<name>`.
+- [SwapVolumeConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/block/swapvolumeconfig.md): SwapVolumeConfig is a disk swap volume configuration document. Swap volume is automatically allocated as a partition on the specified disk and activated as swap, removing a swap volume deactivates swap. The partition label is automatically generated as `s-<name>`.
+- [UserVolumeConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/block/uservolumeconfig.md): UserVolumeConfig is a user volume configuration document. User volume is automatically allocated as a partition on the specified disk and mounted under `/var/mnt/<name>`. The partition label is automatically generated as `u-<name>`.
+- [VolumeConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/block/volumeconfig.md): VolumeConfig is a system volume configuration document. Note: at the moment, only `STATE`, `EPHEMERAL` and `IMAGE-CACHE` system volumes are supported.
+- [ZswapConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/block/zswapconfig.md): ZswapConfig is a zswap (compressed memory) configuration document. When zswap is enabled, Linux kernel compresses pages that would otherwise be swapped out to disk. The compressed pages are stored in a memory pool, which is used to avoid writing to disk when the system is under memory pressure.
+- [ExtensionServiceConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/extensions/extensionserviceconfig.md): ExtensionServiceConfig is a extensionserviceconfig document.
+- [PCIDriverRebindConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/hardware/pcidriverrebindconfig.md): PCIDriverRebindConfig allows to configure PCI driver rebinds.
+- [EthernetConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/network/ethernetconfig.md): EthernetConfig is a config document to configure Ethernet interfaces.
+- [KubeSpanEndpointsConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/network/kubespanendpointsconfig.md): KubeSpanEndpointsConfig is a config document to configure KubeSpan endpoints.
+- [NetworkDefaultActionConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/network/networkdefaultactionconfig.md): NetworkDefaultActionConfig is a ingress firewall default action configuration document.
+- [NetworkRuleConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/network/networkruleconfig.md): NetworkRuleConfig is a network firewall rule config document.
+- [Overview](https://docs.siderolabs.com/talos/v1.11/reference/configuration/overview.md): Talos Linux machine configuration reference.
+- [EventSinkConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/runtime/eventsinkconfig.md): EventSinkConfig is a event sink config document.
+- [KmsgLogConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/runtime/kmsglogconfig.md): KmsgLogConfig is a event sink config document.
+- [WatchdogTimerConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/runtime/watchdogtimerconfig.md): WatchdogTimerConfig is a watchdog timer config document.
+- [TrustedRootsConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/security/trustedrootsconfig.md): TrustedRootsConfig allows to configure additional trusted CA roots.
+- [SideroLinkConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/siderolink/siderolinkconfig.md): SideroLinkConfig is a SideroLink connection machine configuration document.
+- [MachineConfig](https://docs.siderolabs.com/talos/v1.11/reference/configuration/v1alpha1/config.md): Config defines the v1alpha1.Config Talos machine configuration document.
+- [Kernel](https://docs.siderolabs.com/talos/v1.11/reference/kernel.md): Linux kernel reference.
+- [CA Rotation](https://docs.siderolabs.com/talos/v1.11/security/ca-rotation.md): How to rotate Talos and Kubernetes API root certificate authorities.
+- [How to manage PKI and certificate lifetimes with Talos Linux](https://docs.siderolabs.com/talos/v1.11/security/cert-management.md)
+- [Custom Certificate Authorities](https://docs.siderolabs.com/talos/v1.11/security/certificate-authorities.md): How to supply custom certificate authorities
+- [IRSA with Talos Linux](https://docs.siderolabs.com/talos/v1.11/security/iam-roles-for-service-accounts.md): How to enable IAM Roles for Service Accounts (IRSA) on Talos Linux.
+- [Machine Configuration OAuth2 Authentication](https://docs.siderolabs.com/talos/v1.11/security/machine-config-oauth.md): How to authenticate Talos machine configuration download (`talos.config=`) on `metal` platform using OAuth.
+- [Role-based access control (RBAC)](https://docs.siderolabs.com/talos/v1.11/security/rbac.md): Set up RBAC on the Talos Linux API.
+- [SELinux](https://docs.siderolabs.com/talos/v1.11/security/selinux.md): SELinux security module support (experimental).
+- [Talos Security Checklist](https://docs.siderolabs.com/talos/v1.11/security/talos-security-checklist.md): A practical checklist for securing Talos Linux clusters.
+- [Verifying Images](https://docs.siderolabs.com/talos/v1.11/security/verifying-images.md): Verifying Talos container image signatures.
+- [FAQs](https://docs.siderolabs.com/talos/v1.11/troubleshooting/faqs.md): Frequently Asked Questions about Talos Linux.
+- [Troubleshooting](https://docs.siderolabs.com/talos/v1.11/troubleshooting/troubleshooting.md): Troubleshoot control plane and other failures for Talos Linux clusters.
+Hyper Icon
