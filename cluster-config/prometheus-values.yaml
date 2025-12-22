@@ -1,0 +1,143 @@
+# Prometheus Stack Configuration
+# Includes Prometheus, Grafana, Alertmanager, and exporters
+
+# Grafana Configuration
+grafana:
+  enabled: true
+  adminPassword: "admin"  # Change this!
+
+  # Ingress for external access
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - grafana.local
+    path: /
+
+  # Persistent storage for dashboards
+  persistence:
+    enabled: true
+    storageClassName: longhorn
+    size: 5Gi
+
+  # Default dashboards
+  defaultDashboardsEnabled: true
+  defaultDashboardsTimezone: utc
+
+  # Additional data sources (will add Docker hosts)
+  additionalDataSources: []
+
+  # Sidecar for dashboard auto-discovery
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+
+# Prometheus Configuration
+prometheus:
+  enabled: true
+
+  prometheusSpec:
+    # Persistent storage
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+
+    # Retention
+    retention: 15d
+    retentionSize: "18GB"
+
+    # Resource limits for ARM64
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 2Gi
+        cpu: 1000m
+
+    # Enable scraping of all namespaces
+    podMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+
+    # Additional scrape configs for external targets
+    additionalScrapeConfigs:
+      # Docker hosts - configure IPs below
+      - job_name: 'docker-hosts'
+        static_configs:
+          - targets: []  # Add Docker host IPs here, e.g., ['192.168.1.100:9323']
+        metrics_path: /metrics
+
+      # Node exporter on external hosts
+      - job_name: 'external-nodes'
+        static_configs:
+          - targets: []  # Add node_exporter IPs here, e.g., ['192.168.1.100:9100']
+
+      # cAdvisor for container metrics on external hosts
+      - job_name: 'external-cadvisor'
+        static_configs:
+          - targets: []  # Add cAdvisor IPs here, e.g., ['192.168.1.100:8080']
+        metrics_path: /metrics
+
+# Alertmanager Configuration
+alertmanager:
+  enabled: true
+
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
+
+# Node Exporter - for cluster nodes
+nodeExporter:
+  enabled: true
+
+# Kube State Metrics
+kubeStateMetrics:
+  enabled: true
+
+# Prometheus Operator
+prometheusOperator:
+  enabled: true
+
+  # Admission webhooks
+  admissionWebhooks:
+    enabled: true
+    patch:
+      enabled: true
+
+# Component scraping configs
+kubeApiServer:
+  enabled: true
+
+kubeControllerManager:
+  enabled: true
+  endpoints:
+    - 10.10.88.73
+
+kubeScheduler:
+  enabled: true
+  endpoints:
+    - 10.10.88.73
+
+kubeProxy:
+  enabled: true
+
+kubeEtcd:
+  enabled: true
+  endpoints:
+    - 10.10.88.73
+
+# Scrape kubelet
+kubelet:
+  enabled: true

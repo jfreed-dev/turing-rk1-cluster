@@ -1,0 +1,22 @@
+---
+# MetalLB IP Address Pool
+# Using IPs on the same subnet as cluster nodes (10.10.88.x)
+# Make sure these IPs are not in your DHCP range
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: default-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.10.88.80-10.10.88.89
+---
+# L2 Advertisement - announces IPs via ARP on the local network
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - default-pool

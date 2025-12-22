@@ -1,0 +1,68 @@
+version: v1alpha1
+debug: false
+persist: true
+machine:
+    type: worker
+    token: <REDACTED>
+    ca:
+        crt: <REDACTED>
+        key: ""
+    certSANs: []
+    kubelet:
+        image: ghcr.io/siderolabs/kubelet:v1.34.1
+        extraMounts:
+            - destination: /var/lib/longhorn
+              type: bind
+              source: /var/lib/longhorn
+              options:
+                - bind
+                - rshared
+                - rw
+        defaultRuntimeSeccompProfileEnabled: true
+        disableManifestsDirectory: true
+    network:
+        hostname: turing-w2
+        interfaces:
+            - interface: eth0
+              dhcp: true
+    disks:
+        - device: /dev/nvme0n1
+          partitions:
+            - mountpoint: /var/lib/longhorn
+    install:
+        disk: /dev/mmcblk0
+        image: ghcr.io/siderolabs/installer:v1.11.6
+        wipe: false
+    features:
+        rbac: true
+        stableHostname: true
+        apidCheckExtKeyUsage: true
+        diskQuotaSupport: true
+        kubePrism:
+            enabled: true
+            port: 7445
+        hostDNS:
+            enabled: true
+            forwardKubeDNSToHost: true
+cluster:
+    id: <REDACTED>
+    secret: <REDACTED>
+    controlPlane:
+        endpoint: https://10.10.88.73:6443
+    clusterName: turing-cluster
+    network:
+        dnsDomain: cluster.local
+        podSubnets:
+            - 10.244.0.0/16
+        serviceSubnets:
+            - 10.96.0.0/12
+    token: <REDACTED>
+    ca:
+        crt: <REDACTED>
+        key: ""
+    discovery:
+        enabled: true
+        registries:
+            kubernetes:
+                disabled: true
+            service: {}

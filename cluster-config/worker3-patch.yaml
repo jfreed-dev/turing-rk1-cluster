@@ -1,0 +1,19 @@
+machine:
+  network:
+    hostname: turing-w3
+    interfaces:
+      - interface: eth0
+        dhcp: true
+  kubelet:
+    extraMounts:
+      - destination: /var/lib/longhorn
+        type: bind
+        source: /var/lib/longhorn
+        options:
+          - bind
+          - rshared
+          - rw
+  disks:
+    - device: /dev/nvme0n1
+      partitions:
+        - mountpoint: /var/lib/longhorn
