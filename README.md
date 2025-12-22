@@ -9,6 +9,8 @@
 
 A 4-node bare-metal Kubernetes cluster built on Turing RK1 compute modules running Talos Linux, designed for edge computing, AI/ML workloads, and distributed storage.
 
+> **Note**: This project is under active development. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
+
 ## Hardware Summary
 
 ### Turing Pi 2 Board
