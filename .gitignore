@@ -10,10 +10,14 @@ images/**/*.raw
 *.rknn
 *.rkllm
 
-# AI assistant instruction files
+# AI coding assistants
 CLAUDE.md
 AGENT.md
 GEMINI.md
+CODEX.md
+.claude/
+.gemini/
+.codex/
 
 # IDE and editor files
 .idea/
@@ -48,5 +52,3 @@ venv/
 *.log
 logs/
 
-# Claude Code local settings
-.claude/
