@@ -329,7 +329,6 @@ talosctl health
 ```
 turing-rk1-cluster/
 ├── README.md                 # This file
-├── CLAUDE.md                 # AI assistant instructions
 ├── CLUSTER_PLAN.md           # Deployment planning document
 ├── talos-schematic.yaml      # Talos image customization
 ├── cluster-config/           # Cluster configurations
