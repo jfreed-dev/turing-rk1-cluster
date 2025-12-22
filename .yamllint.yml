@@ -1,0 +1,19 @@
+extends: default
+
+rules:
+  line-length:
+    max: 150
+    level: warning
+  comments:
+    min-spaces-from-content: 1
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']
+  document-start: disable
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+
+ignore:
+  - repo/
+  - .github/
+  - cluster-config/  # Talos-generated configs use 4-space indent
