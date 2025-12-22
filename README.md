@@ -1,5 +1,10 @@
 # Turing RK1 Kubernetes Cluster
 
+[![GitHub Release](https://img.shields.io/github/v/release/jfreed-dev/turing-rk1-cluster)](https://github.com/jfreed-dev/turing-rk1-cluster/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Talos](https://img.shields.io/badge/Talos-v1.11.6-blue)](https://www.talos.dev/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-v1.34.1-326CE5?logo=kubernetes&logoColor=white)](https://kubernetes.io/)
+
 A 4-node bare-metal Kubernetes cluster built on Turing RK1 compute modules running Talos Linux, designed for edge computing, AI/ML workloads, and distributed storage.
 
 ## Hardware Summary
