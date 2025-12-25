@@ -50,6 +50,26 @@ Host turing-bmc
     User root
 ```
 
+### BMC Requirements
+
+**Firmware Version:** BMC firmware v2.0.0+ requires authentication for `tpi` commands.
+
+```bash
+# Check BMC firmware version
+ssh turing-bmc "tpi info"
+
+# Set credentials (for BMC v2.0.0+)
+export TPI_USER=root
+export TPI_PASSWORD=turing
+```
+
+**SD Card Required:** The BMC has no local storage. An SD card must be installed and will be automatically mounted at `/mnt/sdcard/`. This is required for flashing images.
+
+```bash
+# Verify SD card is mounted
+ssh turing-bmc "ls -la /mnt/sdcard/"
+```
+
 ---
 
 ## Hardware Overview
@@ -146,19 +166,22 @@ ssh turing-bmc "tpi power off -n 1,2,3,4"
 
 ### Step 2: Flash Each Node
 
-Flash nodes one at a time via BMC:
+Flash nodes one at a time via BMC. The image must be on the SD card mounted at `/mnt/sdcard/`.
 
 ```bash
-# Copy image to BMC
-scp images/latest/metal-arm64.raw turing-bmc:/tmp/
+# Copy image to BMC SD card
+scp images/latest/metal-arm64.raw turing-bmc:/mnt/sdcard/
 
 # Flash each node (repeat for nodes 1-4)
+# Note: -l flag specifies local file on BMC
 for node in 1 2 3 4; do
   echo "Flashing node $node..."
-  ssh turing-bmc "tpi flash -n $node -i /tmp/metal-arm64.raw"
+  ssh turing-bmc "tpi flash -l -n $node -i /mnt/sdcard/metal-arm64.raw"
   sleep 10
 done
 ```
+
+> **Note:** Flashing via BMC takes approximately 15-20 minutes per node for a ~1GB image. For faster flashing, use USB cable method (see [Turing Pi docs](https://docs.turingpi.com/docs/turing-rk1-flashing-os)).
 
 ### Step 3: Power On Nodes
 
@@ -352,7 +375,10 @@ Deploy Portainer agent to connect to existing Portainer instance:
 
 ```bash
 # Deploy with NodePort (or LoadBalancer if MetalLB is configured)
-kubectl apply -f https://downloads.portainer.io/ee2-33/portainer-agent-k8s-nodeport.yaml
+# For Community Edition:
+kubectl apply -f https://downloads.portainer.io/ce2-22/portainer-agent-k8s-nodeport.yaml
+
+# For Business Edition, use the versioned URL from your Portainer instance
 
 # Label namespace for Talos
 kubectl label namespace portainer pod-security.kubernetes.io/enforce=privileged
@@ -406,8 +432,8 @@ turing-cp1      Ready    control-plane   5h    v1.34.1
 # Check BMC power status
 ssh turing-bmc "tpi power status"
 
-# Re-flash if needed
-ssh turing-bmc "tpi flash -n <node> -i /tmp/metal-arm64.raw"
+# Re-flash if needed (ensure image is on SD card)
+ssh turing-bmc "tpi flash -l -n <node> -i /mnt/sdcard/metal-arm64.raw"
 ```
 
 ### Talos Not Responding
