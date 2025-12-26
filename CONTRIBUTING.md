@@ -20,6 +20,12 @@ Thank you for your interest in contributing! This document provides guidelines f
 6. Push to your fork
 7. Open a Pull Request
 
+### Commit Message Guidelines
+
+- Write clear, descriptive commit messages
+- **Do not include AI assistant references** in commit messages (no "Generated with Claude", "Co-Authored-By: Claude", etc.)
+- Use conventional commit format when appropriate (e.g., `feat:`, `fix:`, `docs:`)
+
 ### Pull Request Guidelines
 
 - Keep PRs focused on a single change
