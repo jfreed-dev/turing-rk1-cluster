@@ -35,6 +35,16 @@ Thank you for your interest in contributing! This document provides guidelines f
 
 ## Development Setup
 
+### Initial Setup
+
+After cloning the repository, configure git to use the project's commit hooks:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This enables the commit-msg hook that enforces commit message guidelines.
+
 ### Prerequisites
 
 - Docker with buildx support

@@ -1,0 +1,17 @@
+#!/bin/bash
+# Prevent commit messages from containing AI assistant references
+
+commit_msg_file="$1"
+commit_msg=$(cat "$commit_msg_file")
+
+# Check for AI assistant references (case-insensitive)
+if echo "$commit_msg" | grep -iqE "(claude|Generated with.*Code|Co-Authored-By:.*(Claude|Anthropic))"; then
+    echo "ERROR: Commit message contains AI assistant references."
+    echo "Please remove references to AI assistants from your commit message."
+    echo ""
+    echo "Your message:"
+    echo "$commit_msg"
+    exit 1
+fi
+
+exit 0
