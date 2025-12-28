@@ -14,6 +14,7 @@ This folder contains documentation for deploying and managing a Kubernetes clust
 
 | Document | Description |
 |----------|-------------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Visual architecture diagrams (Mermaid) |
 | [INSTALLATION.md](INSTALLATION.md) | Complete installation guide from scratch |
 | [QUICKREF.md](QUICKREF.md) | Quick reference card for common commands |
 | [STORAGE.md](STORAGE.md) | Longhorn storage and NVMe configuration |

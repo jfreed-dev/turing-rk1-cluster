@@ -280,6 +280,7 @@ talosctl health
 
 | Document | Path | Description |
 |----------|------|-------------|
+| Architecture Diagrams | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Visual cluster architecture (Mermaid) |
 | Installation Guide | [docs/INSTALLATION.md](docs/INSTALLATION.md) | Complete setup from scratch |
 | Storage Guide | [docs/STORAGE.md](docs/STORAGE.md) | Longhorn and NVMe configuration |
 | Networking Guide | [docs/NETWORKING.md](docs/NETWORKING.md) | MetalLB and Ingress setup |
