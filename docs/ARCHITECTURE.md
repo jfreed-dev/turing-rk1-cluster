@@ -238,22 +238,22 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    subgraph kube-system["kube-system namespace"]
+    subgraph kubesystem["kube-system namespace"]
         CoreDNS["coredns"]
         KubeProxy["kube-proxy"]
         FlannelNS["flannel"]
     end
 
-    subgraph metallb-system["metallb-system namespace"]
+    subgraph metallbsystem["metallb-system namespace"]
         MetalLBCtrl["metallb-controller"]
         MetalLBSpkr["metallb-speaker"]
     end
 
-    subgraph ingress-nginx["ingress-nginx namespace"]
+    subgraph ingressnginx["ingress-nginx namespace"]
         IngressCtrl["ingress-nginx-controller"]
     end
 
-    subgraph longhorn-system["longhorn-system namespace"]
+    subgraph longhornsystem["longhorn-system namespace"]
         LonghornMgr["longhorn-manager"]
         LonghornUI["longhorn-ui"]
         LonghornDriver["longhorn-csi-driver"]
@@ -272,7 +272,7 @@ flowchart TB
         PortainerAgent["portainer-agent"]
     end
 
-    subgraph default["default namespace"]
+    subgraph defaultns["default namespace"]
         UserApps["User Applications"]
     end
 ```
