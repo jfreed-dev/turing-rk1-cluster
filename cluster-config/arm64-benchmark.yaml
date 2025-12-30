@@ -1,0 +1,134 @@
+---
+# ARM64 Compute Benchmark for RK3588 Cluster
+# Uses pre-built PyTorch image for ARM64
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: arm64-ml-benchmark
+  namespace: default
+spec:
+  completions: 3
+  parallelism: 3
+  template:
+    metadata:
+      labels:
+        app: ml-benchmark
+    spec:
+      containers:
+      - name: benchmark
+        image: arm64v8/python:3.11-slim
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          echo "=========================================="
+          echo "ARM64 ML Benchmark - RK3588 Cluster"
+          echo "=========================================="
+          echo ""
+          echo "Node: $(hostname)"
+          echo "Architecture: $(uname -m)"
+          echo "Kernel: $(uname -r)"
+          echo ""
+
+          # Get CPU info
+          echo "=== CPU Information ==="
+          cat /proc/cpuinfo | grep -E "^(processor|model name|cpu MHz|Features)" | head -20
+          echo ""
+
+          # Install numpy only (fast)
+          echo "Installing numpy..."
+          pip install -q numpy
+
+          echo ""
+          echo "=== Running Benchmarks ==="
+
+          python3 << 'PYTHON'
+          import numpy as np
+          import time
+          import os
+
+          def matrix_benchmark():
+              """Matrix multiplication benchmark"""
+              sizes = [256, 512, 1024]
+              results = []
+
+              for size in sizes:
+                  a = np.random.randn(size, size).astype(np.float32)
+                  b = np.random.randn(size, size).astype(np.float32)
+
+                  # Warmup
+                  np.dot(a, b)
+
+                  # Benchmark
+                  iterations = 10 if size < 1024 else 5
+                  start = time.time()
+                  for _ in range(iterations):
+                      c = np.dot(a, b)
+                  elapsed = (time.time() - start) / iterations * 1000
+
+                  gflops = (2 * size**3) / (elapsed / 1000) / 1e9
+                  results.append((size, elapsed, gflops))
+                  print(f"  Matrix {size}x{size}: {elapsed:.1f}ms, {gflops:.2f} GFLOPS")
+
+              return results
+
+          def memory_bandwidth():
+              """Memory bandwidth benchmark"""
+              size_mb = 100
+              data = np.random.randn(size_mb * 1024 * 1024 // 8).astype(np.float64)
+
+              # Copy benchmark
+              start = time.time()
+              for _ in range(10):
+                  copy = data.copy()
+              elapsed = time.time() - start
+
+              bandwidth = (size_mb * 10 * 2) / elapsed / 1024  # GB/s (read + write)
+              print(f"  Memory copy {size_mb}MB: {bandwidth:.1f} GB/s")
+              return bandwidth
+
+          def inference_simulation():
+              """Simulated inference workload"""
+              batch_size = 32
+              hidden = 512
+              layers = 6
+
+              # Create fake model weights
+              weights = [np.random.randn(hidden, hidden).astype(np.float32) for _ in range(layers)]
+
+              # Run inference simulation
+              times = []
+              for _ in range(20):
+                  x = np.random.randn(batch_size, hidden).astype(np.float32)
+                  start = time.time()
+                  for w in weights:
+                      x = np.maximum(0, np.dot(x, w))  # ReLU activation
+                  times.append((time.time() - start) * 1000)
+
+              avg = np.mean(times)
+              throughput = batch_size / (avg / 1000)
+              print(f"  Simulated inference: {avg:.2f}ms, {throughput:.0f} samples/sec")
+              return avg, throughput
+
+          print("\n--- Matrix Multiplication ---")
+          matrix_benchmark()
+
+          print("\n--- Memory Bandwidth ---")
+          memory_bandwidth()
+
+          print("\n--- Inference Simulation ---")
+          inference_simulation()
+
+          print("\n========================================")
+          print("Benchmark Complete!")
+          print("========================================")
+          PYTHON
+
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "2000m"
+      restartPolicy: Never
+  backoffLimit: 0

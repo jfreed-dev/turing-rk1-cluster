@@ -1,0 +1,21 @@
+machine:
+  network:
+    hostname: turing-w2
+    interfaces:
+      - interface: eth0
+        dhcp: true
+  install:
+    disk: /dev/mmcblk0
+  kubelet:
+    extraMounts:
+      - destination: /var/lib/longhorn
+        type: bind
+        source: /var/lib/longhorn
+        options:
+          - bind
+          - rshared
+          - rw
+  disks:
+    - device: /dev/nvme0n1
+      partitions:
+        - mountpoint: /var/lib/longhorn

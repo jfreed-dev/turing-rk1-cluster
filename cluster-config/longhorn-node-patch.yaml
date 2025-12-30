@@ -1,0 +1,18 @@
+spec:
+  disks:
+    default-disk-b30600000000:
+      allowScheduling: true
+      diskType: filesystem
+      evictionRequested: false
+      path: /var/lib/longhorn
+      storageReserved: 0
+      tags: []
+    nvme-storage:
+      allowScheduling: true
+      diskType: filesystem
+      evictionRequested: false
+      path: /var/mnt/longhorn-storage
+      storageReserved: 0
+      tags:
+        - nvme
+        - fast
