@@ -179,7 +179,7 @@ spec:
 
 ## When to Choose Each Distribution
 
-### Choose Talos Linux When:
+### Choose Talos Linux When
 
 1. **Security is paramount** - Immutable OS, no shell access, minimal attack surface
 2. **Production workloads** - Pre-hardened, atomic updates, API-driven management
@@ -187,7 +187,7 @@ spec:
 4. **GitOps workflows** - Configuration as code, declarative management
 5. **Standard Kubernetes workloads** - No special hardware requirements
 
-### Choose K3s on Armbian When:
+### Choose K3s on Armbian When
 
 1. **NPU/GPU required** - AI inference, model serving, hardware acceleration
 2. **Learning Kubernetes** - SSH access makes debugging easier
