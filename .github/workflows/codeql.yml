@@ -19,15 +19,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@27fcff4ecb39e96348e7ceddcc2d9ef42308b6fc # v4
+        uses: github/codeql-action/init@7c9a7896f03bb1f3de14c5663ed46759e27443e0 # v4.31.9
         with:
           languages: actions
           queries: +security-extended
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@27fcff4ecb39e96348e7ceddcc2d9ef42308b6fc # v4
+        uses: github/codeql-action/analyze@7c9a7896f03bb1f3de14c5663ed46759e27443e0 # v4.31.9
         with:
           category: "/language:actions"
