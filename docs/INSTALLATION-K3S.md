@@ -55,6 +55,22 @@ export KUBECONFIG=~/.kube/config-k3s-turing
 kubectl get nodes -o wide
 ```
 
+### Cluster Status
+
+For a comprehensive health check, run:
+
+```bash
+./cluster-status.sh
+```
+
+This script auto-detects K3s clusters and displays:
+- Node reachability and SSH status
+- K3s service status on all nodes
+- System resources (CPU, memory, disk)
+- Kubernetes nodes and pod summary
+- LoadBalancer and Ingress resources
+- Longhorn storage status (if installed)
+
 For step-by-step manual installation or customization, continue reading below.
 
 ---

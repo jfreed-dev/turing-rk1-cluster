@@ -29,6 +29,9 @@ See [docs/COMPARISON.md](docs/COMPARISON.md) for detailed feature comparison.
 # K3s on Armbian
 ./scripts/setup-k3s-node.sh   # Run on each node
 ./scripts/deploy-k3s-cluster.sh  # Deploy from workstation
+
+# Check cluster status (works with both distributions)
+./cluster-status.sh           # Auto-detects and shows health summary
 ```
 
 > **Note**: This project is under active development. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
@@ -358,6 +361,7 @@ turing-rk1-cluster/
 ├── README.md                 # This file
 ├── CLUSTER_PLAN.md           # Deployment planning document
 ├── deploy-cluster.sh         # Automated Talos deployment script
+├── cluster-status.sh         # Cluster health and status checker
 ├── talos-schematic.yaml      # Talos image customization
 ├── cluster-config/           # Cluster configurations
 │   ├── talosconfig           # Talos CLI config

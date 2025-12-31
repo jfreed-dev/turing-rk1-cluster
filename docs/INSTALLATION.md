@@ -38,6 +38,22 @@ Use the `deploy-cluster.sh` script for automated deployment:
 ./deploy-cluster.sh uart 1        # View node 1 UART output
 ```
 
+### Cluster Status
+
+After deployment, check cluster health with:
+
+```bash
+./cluster-status.sh
+```
+
+This script auto-detects the cluster type and displays:
+- Node reachability and health
+- Kubernetes nodes and conditions
+- Pod status summary by namespace
+- LoadBalancer and Ingress resources
+- Longhorn storage status
+- Recent warning events
+
 For step-by-step manual installation, continue reading below.
 
 ---
