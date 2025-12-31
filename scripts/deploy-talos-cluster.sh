@@ -19,6 +19,12 @@ TALOS_VERSION="v1.11.6"
 BMC_HOST="${BMC_HOST:-10.10.88.70}"
 BMC_SSH="ssh turing-bmc"
 CONTROL_PLANE_IP="10.10.88.73"
+
+# TPI CLI Configuration (for local tpi commands)
+# Set USE_LOCAL_TPI=1 to use local tpi instead of SSH to BMC
+USE_LOCAL_TPI="${USE_LOCAL_TPI:-0}"
+export TPI_HOSTNAME="${TPI_HOSTNAME:-$BMC_HOST}"
+# TPI_USERNAME and TPI_PASSWORD should be set in environment if using local tpi
 WORKER_IPS=("10.10.88.74" "10.10.88.75" "10.10.88.76")
 ALL_NODE_IPS=("$CONTROL_PLANE_IP" "${WORKER_IPS[@]}")
 KUBERNETES_ENDPOINT="https://${CONTROL_PLANE_IP}:6443"
@@ -107,7 +113,13 @@ wait_for_talos_api() {
 # =============================================================================
 
 bmc_cmd() {
-    $BMC_SSH "$@"
+    if [[ "$USE_LOCAL_TPI" == "1" ]]; then
+        # Run tpi locally (requires TPI_HOSTNAME, TPI_USERNAME, TPI_PASSWORD)
+        bash -c "$*"
+    else
+        # Run via SSH to BMC
+        $BMC_SSH "$@"
+    fi
 }
 
 bmc_power_status() {
@@ -176,23 +188,41 @@ check_prerequisites() {
 
     # Check BMC access
     log_info "Checking BMC access..."
-    if ! $BMC_SSH "echo 'BMC OK'" &>/dev/null; then
-        log_error "Cannot connect to BMC. Ensure SSH config has 'turing-bmc' host."
-        log_info "Add to ~/.ssh/config:"
-        echo "  Host turing-bmc"
-        echo "    HostName $BMC_HOST"
-        echo "    User root"
-        return 1
-    fi
-    log_success "BMC accessible"
+    if [[ "$USE_LOCAL_TPI" == "1" ]]; then
+        # Using local tpi
+        if ! command -v tpi &>/dev/null; then
+            log_error "tpi CLI not found. Install from: https://github.com/turing-machines/tpi"
+            return 1
+        fi
+        if ! tpi info &>/dev/null 2>&1; then
+            log_error "Cannot connect to BMC via tpi at $TPI_HOSTNAME"
+            log_info "Ensure TPI_USERNAME and TPI_PASSWORD are set, or run:"
+            log_info "  tpi --host $TPI_HOSTNAME --user <user> info"
+            return 1
+        fi
+        log_success "BMC accessible via local tpi"
+    else
+        # Using SSH to BMC
+        if ! $BMC_SSH "echo 'BMC OK'" &>/dev/null; then
+            log_error "Cannot connect to BMC. Ensure SSH config has 'turing-bmc' host."
+            log_info "Add to ~/.ssh/config:"
+            echo "  Host turing-bmc"
+            echo "    HostName $BMC_HOST"
+            echo "    User root"
+            log_info ""
+            log_info "Alternatively, set USE_LOCAL_TPI=1 with TPI credentials"
+            return 1
+        fi
+        log_success "BMC accessible via SSH"
 
-    # Check tpi tool on BMC
-    log_info "Checking tpi tool on BMC..."
-    if ! bmc_cmd "which tpi" &>/dev/null; then
-        log_error "tpi tool not found on BMC"
-        return 1
+        # Check tpi tool on BMC
+        log_info "Checking tpi tool on BMC..."
+        if ! bmc_cmd "which tpi" &>/dev/null; then
+            log_error "tpi tool not found on BMC"
+            return 1
+        fi
+        log_success "tpi tool available on BMC"
     fi
-    log_success "tpi tool available"
 
     # Check Talos image
     log_info "Checking Talos image..."

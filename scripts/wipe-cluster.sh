@@ -17,6 +17,10 @@ CONFIG_DIR="${SCRIPT_DIR}/../cluster-config"
 BMC_IP="${BMC_IP:-10.10.88.70}"
 BMC_USER="${BMC_USER:-root}"
 
+# TPI CLI Configuration (for local tpi commands)
+export TPI_HOSTNAME="${TPI_HOSTNAME:-$BMC_IP}"
+# TPI_USERNAME and TPI_PASSWORD should be set in environment if needed
+
 # Node Configuration
 CONTROL_PLANE_IP="10.10.88.73"
 WORKER_IPS=("10.10.88.74" "10.10.88.75" "10.10.88.76")
@@ -85,11 +89,20 @@ confirm() {
     fi
 }
 
-# Check for TPI CLI
+# Check for TPI CLI and connectivity
 check_tpi() {
     if ! command -v tpi &> /dev/null; then
         log_error "TPI CLI not found. Install from: https://github.com/turing-machines/tpi"
         exit 1
+    fi
+
+    # Verify BMC connectivity
+    if ! tpi info &>/dev/null 2>&1; then
+        log_warn "TPI cannot connect to BMC at $TPI_HOSTNAME"
+        log_info "Ensure TPI_USERNAME and TPI_PASSWORD are set, or run:"
+        log_info "  tpi --host $TPI_HOSTNAME --user <user> info"
+        log_info "to cache credentials"
+        return 1
     fi
 }
 
@@ -699,8 +712,11 @@ Storage Targets:
   emmc    /dev/mmcblk0  - eMMC flash (boot drive, OS)
 
 Environment Variables:
-  BMC_IP      BMC IP address (default: 10.10.88.70)
-  SSH_USER    SSH user for Armbian nodes (default: root)
+  BMC_IP          BMC IP address (default: 10.10.88.70)
+  SSH_USER        SSH user for Armbian nodes (default: root)
+  TPI_HOSTNAME    TPI target host (default: BMC_IP)
+  TPI_USERNAME    TPI authentication username
+  TPI_PASSWORD    TPI authentication password
 
 Examples:
   ./wipe-cluster.sh status           # Check cluster and storage status
