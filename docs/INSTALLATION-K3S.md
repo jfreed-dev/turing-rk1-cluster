@@ -60,7 +60,7 @@ kubectl get nodes -o wide
 For a comprehensive health check, run:
 
 ```bash
-./cluster-status.sh
+./scripts/talos-cluster-status.sh
 ```
 
 This script auto-detects K3s clusters and displays:

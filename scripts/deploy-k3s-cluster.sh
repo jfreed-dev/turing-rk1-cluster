@@ -16,7 +16,7 @@ echo ""
 
 # Install K3s Server
 echo "[1/4] Installing K3s Server on $SERVER_IP..."
-ssh $SSH_USER@$SERVER_IP << 'REMOTE_SCRIPT'
+ssh "$SSH_USER@$SERVER_IP" << 'REMOTE_SCRIPT'
 curl -sfL https://get.k3s.io | sh -s - server \
   --cluster-init \
   --disable=traefik \
@@ -32,7 +32,7 @@ sleep 30
 
 # Get token
 echo "[2/4] Getting node token..."
-K3S_TOKEN=$(ssh $SSH_USER@$SERVER_IP "cat /var/lib/rancher/k3s/server/node-token")
+K3S_TOKEN=$(ssh "$SSH_USER@$SERVER_IP" "cat /var/lib/rancher/k3s/server/node-token")
 echo "Token retrieved"
 
 # Install K3s Agents
@@ -41,7 +41,8 @@ for i in "${!AGENT_IPS[@]}"; do
   AGENT_IP="${AGENT_IPS[$i]}"
   AGENT_NAME="k3s-agent-$((i+1))"
   echo "  Installing on $AGENT_IP ($AGENT_NAME)..."
-  ssh $SSH_USER@$AGENT_IP << REMOTE_SCRIPT
+  # shellcheck disable=SC2087 # Variables intentionally expanded client-side
+  ssh "$SSH_USER@$AGENT_IP" << REMOTE_SCRIPT
 curl -sfL https://get.k3s.io | K3S_URL=https://$SERVER_IP:6443 K3S_TOKEN=$K3S_TOKEN sh -s - agent \
   --node-name=$AGENT_NAME
 REMOTE_SCRIPT
@@ -50,7 +51,7 @@ done
 # Get kubeconfig
 echo "[4/4] Retrieving kubeconfig..."
 mkdir -p ~/.kube
-scp $SSH_USER@$SERVER_IP:/etc/rancher/k3s/k3s.yaml ~/.kube/config-k3s-turing
+scp "$SSH_USER@$SERVER_IP":/etc/rancher/k3s/k3s.yaml ~/.kube/config-k3s-turing
 sed -i "s/127.0.0.1/$SERVER_IP/g" ~/.kube/config-k3s-turing
 
 echo ""

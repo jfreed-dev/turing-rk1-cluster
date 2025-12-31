@@ -1,41 +1,84 @@
 #!/bin/bash
-# Cluster Wipe Script for Turing RK1
-# Prepares nodes for switching between Talos and K3s distributions
 #
-# Usage: ./wipe-cluster.sh [talos|k3s|full]
-#   talos - Wipe for Talos installation (resets Talos nodes)
-#   k3s   - Wipe for K3s installation (uninstalls K3s from Armbian)
-#   full  - Full node wipe via BMC (reflash required)
+# Turing RK1 Cluster Wipe Script
+# Detects cluster type and wipes NVMe and eMMC storage to prepare for fresh deployment
+#
+# Usage: ./wipe-cluster.sh [command]
+#
+set -euo pipefail
 
-set -e
-
+# =============================================================================
 # Configuration
+# =============================================================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="${SCRIPT_DIR}/../cluster-config"
+
+# BMC Configuration
 BMC_IP="${BMC_IP:-10.10.88.70}"
 BMC_USER="${BMC_USER:-root}"
-NODES=(1 2 3 4)
-NODE_IPS=("10.10.88.73" "10.10.88.74" "10.10.88.75" "10.10.88.76")
+
+# Node Configuration
+CONTROL_PLANE_IP="10.10.88.73"
+WORKER_IPS=("10.10.88.74" "10.10.88.75" "10.10.88.76")
+ALL_NODE_IPS=("$CONTROL_PLANE_IP" "${WORKER_IPS[@]}")
+NODE_NUMBERS=(1 2 3 4)
 SSH_USER="${SSH_USER:-root}"
 
-# Colors for output
+# Storage devices
+NVME_DEVICE="/dev/nvme0n1"
+EMMC_DEVICE="/dev/mmcblk0"
+
+# Cluster type (detected)
+CLUSTER_TYPE=""
+
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+# =============================================================================
+# Helper Functions
+# =============================================================================
 
 print_header() {
-    echo -e "\n${GREEN}=== $1 ===${NC}\n"
+    echo -e "\n${BOLD}${BLUE}═══════════════════════════════════════════════════════════════${NC}"
+    echo -e "${BOLD}${BLUE}  $1${NC}"
+    echo -e "${BOLD}${BLUE}═══════════════════════════════════════════════════════════════${NC}\n"
 }
 
-print_warning() {
-    echo -e "${YELLOW}WARNING: $1${NC}"
+print_section() {
+    echo -e "\n${BOLD}${CYAN}─── $1 ───${NC}\n"
 }
 
-print_error() {
-    echo -e "${RED}ERROR: $1${NC}"
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[✓]${NC} $1"
+}
+
+log_warn() {
+    echo -e "${YELLOW}[!]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[✗]${NC} $1"
+}
+
+check_reachable() {
+    local ip=$1
+    ping -c 1 -W 2 "$ip" &>/dev/null
 }
 
 confirm() {
-    read -p "Are you sure you want to proceed? This will destroy cluster data! (yes/no): " response
+    local message="${1:-This will destroy all cluster data!}"
+    echo -e "${RED}${BOLD}WARNING: $message${NC}"
+    read -r -p "Are you sure you want to proceed? (yes/no): " response
     if [[ "$response" != "yes" ]]; then
         echo "Aborted."
         exit 1
@@ -45,294 +88,685 @@ confirm() {
 # Check for TPI CLI
 check_tpi() {
     if ! command -v tpi &> /dev/null; then
-        print_error "TPI CLI not found. Install from: https://github.com/turing-machines/tpi"
+        log_error "TPI CLI not found. Install from: https://github.com/turing-machines/tpi"
         exit 1
     fi
 }
 
-# Wipe Talos cluster
-wipe_talos() {
-    print_header "Wiping Talos Cluster"
+# =============================================================================
+# Cluster Detection (from talos-cluster-status.sh)
+# =============================================================================
 
-    print_warning "This will reset all Talos nodes and destroy all data!"
-    confirm
+detect_cluster_type() {
+    print_section "Detecting Cluster Type"
 
-    # Check if talosctl is available
-    if ! command -v talosctl &> /dev/null; then
-        print_error "talosctl not found"
+    local reachable_nodes=0
+    local talos_nodes=0
+    local ssh_nodes=0
+    local k3s_nodes=0
+    local maintenance_nodes=0
+
+    for ip in "${ALL_NODE_IPS[@]}"; do
+        if check_reachable "$ip"; then
+            ((reachable_nodes++))
+
+            # Check for Talos API
+            if talosctl --nodes "$ip" version &>/dev/null 2>&1; then
+                ((talos_nodes++))
+                continue
+            fi
+
+            # Check for Talos maintenance mode (port 50000)
+            if nc -zw2 "$ip" 50000 &>/dev/null 2>&1; then
+                ((maintenance_nodes++))
+                continue
+            fi
+
+            # Check for SSH access
+            if ssh -o ConnectTimeout=3 -o BatchMode=yes "$SSH_USER@$ip" "echo ok" &>/dev/null 2>&1; then
+                ((ssh_nodes++))
+                # Check if K3s is installed
+                if ssh -o ConnectTimeout=3 -o BatchMode=yes "$SSH_USER@$ip" "which k3s" &>/dev/null 2>&1; then
+                    ((k3s_nodes++))
+                fi
+            fi
+        fi
+    done
+
+    echo "  Reachable nodes: $reachable_nodes / ${#ALL_NODE_IPS[@]}"
+    echo "  Talos nodes: $talos_nodes"
+    echo "  Talos maintenance: $maintenance_nodes"
+    echo "  SSH accessible: $ssh_nodes"
+    echo "  K3s installed: $k3s_nodes"
+    echo ""
+
+    # Determine cluster type
+    if [[ $talos_nodes -gt 0 ]]; then
+        CLUSTER_TYPE="talos"
+        log_success "Detected: Talos Linux cluster"
+    elif [[ $maintenance_nodes -gt 0 ]]; then
+        CLUSTER_TYPE="talos-maintenance"
+        log_success "Detected: Talos in maintenance mode"
+    elif [[ $k3s_nodes -gt 0 ]]; then
+        CLUSTER_TYPE="k3s"
+        log_success "Detected: K3s on Armbian cluster"
+    elif [[ $ssh_nodes -gt 0 ]]; then
+        CLUSTER_TYPE="armbian"
+        log_success "Detected: Armbian (no K3s)"
+    elif [[ $reachable_nodes -eq 0 ]]; then
+        CLUSTER_TYPE="offline"
+        log_warn "All nodes appear offline"
+    else
+        CLUSTER_TYPE="unknown"
+        log_warn "Unable to determine cluster type"
+    fi
+
+    return 0
+}
+
+# =============================================================================
+# Storage Detection
+# =============================================================================
+
+detect_node_storage() {
+    local ip=$1
+    local method=$2  # "ssh" or "talos"
+
+    echo "  Detecting storage on $ip..."
+
+    if [[ "$method" == "ssh" ]]; then
+        ssh -o ConnectTimeout=5 "$SSH_USER@$ip" "
+            echo '    eMMC:'
+            if [ -b $EMMC_DEVICE ]; then
+                size=\$(lsblk -b -d -n -o SIZE $EMMC_DEVICE 2>/dev/null | awk '{printf \"%.1fGB\", \$1/1024/1024/1024}')
+                echo \"      $EMMC_DEVICE: \$size\"
+                lsblk -n -o NAME,SIZE,FSTYPE,MOUNTPOINT $EMMC_DEVICE 2>/dev/null | sed 's/^/      /' || true
+            else
+                echo '      Not found'
+            fi
+            echo '    NVMe:'
+            if [ -b $NVME_DEVICE ]; then
+                size=\$(lsblk -b -d -n -o SIZE $NVME_DEVICE 2>/dev/null | awk '{printf \"%.1fGB\", \$1/1024/1024/1024}')
+                echo \"      $NVME_DEVICE: \$size\"
+                lsblk -n -o NAME,SIZE,FSTYPE,MOUNTPOINT $NVME_DEVICE 2>/dev/null | sed 's/^/      /' || true
+            else
+                echo '      Not found'
+            fi
+        " 2>/dev/null || echo "    Could not detect storage"
+    elif [[ "$method" == "talos" ]]; then
+        talosctl --nodes "$ip" disks 2>/dev/null | grep -E "(nvme|mmcblk)" | sed 's/^/    /' || echo "    Could not detect storage"
+    fi
+}
+
+# =============================================================================
+# Wipe Functions
+# =============================================================================
+
+wipe_nvme_ssh() {
+    local ip=$1
+    local node_num=$2
+
+    log_info "Wiping NVMe on node $node_num ($ip)..."
+
+    ssh -o ConnectTimeout=10 "$SSH_USER@$ip" "
+        set -e
+        if [ -b $NVME_DEVICE ]; then
+            # Unmount any mounted partitions
+            for mount in \$(mount | grep $NVME_DEVICE | awk '{print \$3}'); do
+                echo \"  Unmounting \$mount...\"
+                umount -f \"\$mount\" 2>/dev/null || true
+            done
+
+            # Stop any services using the disk
+            systemctl stop longhorn* 2>/dev/null || true
+
+            # Wipe filesystem signatures
+            echo '  Wiping filesystem signatures...'
+            wipefs -af $NVME_DEVICE 2>/dev/null || true
+
+            # Zero out first and last 1MB (partition tables, GPT backup)
+            echo '  Zeroing partition tables...'
+            dd if=/dev/zero of=$NVME_DEVICE bs=1M count=1 conv=fsync 2>/dev/null || true
+
+            # Get disk size and zero last 1MB
+            size=\$(blockdev --getsize64 $NVME_DEVICE)
+            dd if=/dev/zero of=$NVME_DEVICE bs=1M seek=\$((size/1048576 - 1)) count=1 conv=fsync 2>/dev/null || true
+
+            # Inform kernel of partition changes
+            partprobe $NVME_DEVICE 2>/dev/null || true
+
+            echo '  NVMe wiped successfully'
+        else
+            echo '  NVMe device not found, skipping'
+        fi
+    " 2>/dev/null; local rc=$?
+    if [[ $rc -eq 0 ]]; then
+        log_success "Node $node_num NVMe wiped"
+    else
+        log_warn "Node $node_num NVMe wipe may have failed"
+    fi
+}
+
+wipe_emmc_ssh() {
+    local ip=$1
+    local node_num=$2
+
+    log_info "Wiping eMMC on node $node_num ($ip)..."
+
+    ssh -o ConnectTimeout=10 "$SSH_USER@$ip" "
+        set -e
+        if [ -b $EMMC_DEVICE ]; then
+            echo '  WARNING: Wiping eMMC will remove the operating system!'
+            echo '  The node will not boot until reflashed.'
+
+            # Unmount all eMMC partitions except root if we're running from it
+            root_dev=\$(findmnt -n -o SOURCE / | sed 's/[0-9]*$//')
+            if [[ \"\$root_dev\" == \"$EMMC_DEVICE\"* ]]; then
+                echo '  Running from eMMC - will wipe partition table only'
+                echo '  Node will need to be reflashed via BMC'
+
+                # Just wipe the partition table - system will be unbootable
+                wipefs -af $EMMC_DEVICE 2>/dev/null || true
+            else
+                # Not running from eMMC, safe to fully wipe
+                for mount in \$(mount | grep $EMMC_DEVICE | awk '{print \$3}'); do
+                    echo \"  Unmounting \$mount...\"
+                    umount -f \"\$mount\" 2>/dev/null || true
+                done
+
+                wipefs -af $EMMC_DEVICE 2>/dev/null || true
+                dd if=/dev/zero of=$EMMC_DEVICE bs=1M count=1 conv=fsync 2>/dev/null || true
+            fi
+
+            echo '  eMMC wiped successfully'
+        else
+            echo '  eMMC device not found, skipping'
+        fi
+    " 2>/dev/null; local rc=$?
+    if [[ $rc -eq 0 ]]; then
+        log_success "Node $node_num eMMC wiped"
+    else
+        log_warn "Node $node_num eMMC wipe may have failed"
+    fi
+}
+
+wipe_talos_node() {
+    local ip=$1
+    local node_num=$2
+
+    log_info "Resetting Talos node $node_num ($ip)..."
+
+    # Use talosctl reset to wipe the node
+    if talosctl --nodes "$ip" reset \
+        --graceful=false \
+        --reboot=false \
+        --system-labels-to-wipe STATE \
+        --system-labels-to-wipe EPHEMERAL \
+        2>/dev/null; then
+        log_success "Node $node_num Talos reset complete"
+    else
+        log_warn "Node $node_num Talos reset failed (may already be wiped)"
+    fi
+}
+
+# =============================================================================
+# Main Wipe Commands
+# =============================================================================
+
+cmd_status() {
+    print_header "Cluster Wipe Status"
+    detect_cluster_type
+
+    print_section "Storage Status"
+
+    for i in "${!ALL_NODE_IPS[@]}"; do
+        ip="${ALL_NODE_IPS[$i]}"
+        node_num="${NODE_NUMBERS[$i]}"
+        echo -e "${BOLD}Node $node_num ($ip):${NC}"
+
+        if ! check_reachable "$ip"; then
+            echo "  Unreachable"
+            echo ""
+            continue
+        fi
+
+        case "$CLUSTER_TYPE" in
+            talos)
+                detect_node_storage "$ip" "talos"
+                ;;
+            k3s|armbian)
+                detect_node_storage "$ip" "ssh"
+                ;;
+            talos-maintenance)
+                echo "  In maintenance mode - cannot detect storage"
+                ;;
+            *)
+                echo "  Cannot detect storage"
+                ;;
+        esac
+        echo ""
+    done
+
+    # BMC status
+    print_section "BMC Status"
+    if check_reachable "$BMC_IP"; then
+        log_success "BMC ($BMC_IP) is reachable"
+        if command -v tpi &>/dev/null; then
+            echo ""
+            echo "Power Status:"
+            tpi power status 2>/dev/null || echo "  Unable to query"
+        fi
+    else
+        log_warn "BMC ($BMC_IP) is not reachable"
+    fi
+}
+
+cmd_wipe_nvme() {
+    print_header "Wipe NVMe Storage"
+    detect_cluster_type
+
+    if [[ "$CLUSTER_TYPE" == "offline" ]]; then
+        log_error "No nodes are reachable"
         exit 1
     fi
 
-    # Try graceful reset first
-    echo "Attempting graceful Talos reset..."
+    confirm "This will wipe ALL NVMe drives on ALL reachable nodes!"
 
-    for i in "${!NODE_IPS[@]}"; do
-        node_ip="${NODE_IPS[$i]}"
-        node_num=$((i + 1))
+    print_section "Wiping NVMe Drives"
 
-        echo "  Resetting node $node_num ($node_ip)..."
+    for i in "${!ALL_NODE_IPS[@]}"; do
+        ip="${ALL_NODE_IPS[$i]}"
+        node_num="${NODE_NUMBERS[$i]}"
 
-        # Try graceful reset, continue if it fails
-        talosctl --endpoints "$node_ip" --nodes "$node_ip" reset \
-            --graceful=false \
-            --reboot=false \
-            2>/dev/null || echo "    Node $node_num may already be wiped or unreachable"
+        if ! check_reachable "$ip"; then
+            log_warn "Node $node_num ($ip) unreachable, skipping"
+            continue
+        fi
+
+        case "$CLUSTER_TYPE" in
+            k3s|armbian)
+                wipe_nvme_ssh "$ip" "$node_num"
+                ;;
+            talos)
+                log_warn "Node $node_num: Use 'wipe talos' for Talos nodes (includes NVMe)"
+                ;;
+            talos-maintenance)
+                log_warn "Node $node_num in maintenance mode - reflash via BMC to wipe"
+                ;;
+        esac
     done
 
-    echo ""
-    print_header "Talos Reset Complete"
-    echo "Nodes have been reset. To reinstall:"
-    echo "  1. Flash Talos image: tpi flash -n <node> --image-path images/latest/metal-arm64.raw"
-    echo "  2. Power on nodes: tpi power on -n <node>"
-    echo "  3. Apply configs: talosctl apply-config --insecure --nodes <ip> --file <config>"
-    echo ""
-    echo "See docs/INSTALLATION.md for full instructions."
+    print_section "NVMe Wipe Complete"
+    log_info "NVMe drives have been wiped"
 }
 
-# Wipe K3s cluster (for Armbian nodes)
-wipe_k3s() {
-    print_header "Wiping K3s Cluster"
+cmd_wipe_emmc() {
+    print_header "Wipe eMMC Storage"
+    detect_cluster_type
 
-    print_warning "This will uninstall K3s from all nodes!"
-    confirm
+    if [[ "$CLUSTER_TYPE" == "offline" ]]; then
+        log_error "No nodes are reachable"
+        exit 1
+    fi
 
-    # Uninstall from server first (node 1)
-    echo "Uninstalling K3s server from node 1 (${NODE_IPS[0]})..."
-    ssh -o ConnectTimeout=5 "$SSH_USER@${NODE_IPS[0]}" \
-        '/usr/local/bin/k3s-uninstall.sh 2>/dev/null || echo "K3s server not installed or already removed"'
+    echo -e "${RED}${BOLD}"
+    echo "╔══════════════════════════════════════════════════════════════════╗"
+    echo "║  DANGER: This will wipe eMMC boot drives!                        ║"
+    echo "║  Nodes will NOT boot until reflashed via BMC.                    ║"
+    echo "║  You will need to use 'tpi flash' to reinstall an OS.            ║"
+    echo "╚══════════════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
 
-    # Uninstall from agents
-    for i in 1 2 3; do
-        node_ip="${NODE_IPS[$i]}"
-        node_num=$((i + 1))
+    confirm "This will make ALL nodes UNBOOTABLE!"
 
-        echo "Uninstalling K3s agent from node $node_num ($node_ip)..."
-        ssh -o ConnectTimeout=5 "$SSH_USER@$node_ip" \
-            '/usr/local/bin/k3s-agent-uninstall.sh 2>/dev/null || echo "K3s agent not installed or already removed"' \
-            2>/dev/null || echo "  Node $node_num unreachable"
+    print_section "Wiping eMMC Drives"
+
+    for i in "${!ALL_NODE_IPS[@]}"; do
+        ip="${ALL_NODE_IPS[$i]}"
+        node_num="${NODE_NUMBERS[$i]}"
+
+        if ! check_reachable "$ip"; then
+            log_warn "Node $node_num ($ip) unreachable, skipping"
+            continue
+        fi
+
+        case "$CLUSTER_TYPE" in
+            k3s|armbian)
+                wipe_emmc_ssh "$ip" "$node_num"
+                ;;
+            talos)
+                log_warn "Node $node_num: Use 'wipe talos' for Talos nodes"
+                ;;
+            talos-maintenance)
+                log_warn "Node $node_num in maintenance mode - reflash via BMC"
+                ;;
+        esac
     done
 
-    # Optionally wipe NVMe
-    read -p "Wipe NVMe storage on all nodes? (yes/no): " wipe_nvme
+    print_section "eMMC Wipe Complete"
+    log_warn "Nodes will need to be reflashed via BMC before they can boot"
+    log_info "Use: tpi flash -n <node> --image-path <image>"
+}
+
+cmd_wipe_all() {
+    print_header "Full Storage Wipe (NVMe + eMMC)"
+    detect_cluster_type
+
+    if [[ "$CLUSTER_TYPE" == "offline" ]]; then
+        log_error "No nodes are reachable"
+        exit 1
+    fi
+
+    echo -e "${RED}${BOLD}"
+    echo "╔══════════════════════════════════════════════════════════════════╗"
+    echo "║  DANGER: This will wipe BOTH NVMe AND eMMC on ALL nodes!         ║"
+    echo "║  All data will be destroyed.                                     ║"
+    echo "║  Nodes will NOT boot until reflashed via BMC.                    ║"
+    echo "╚══════════════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+
+    confirm "This will DESTROY ALL DATA and make nodes UNBOOTABLE!"
+
+    print_section "Wiping All Storage"
+
+    for i in "${!ALL_NODE_IPS[@]}"; do
+        ip="${ALL_NODE_IPS[$i]}"
+        node_num="${NODE_NUMBERS[$i]}"
+
+        if ! check_reachable "$ip"; then
+            log_warn "Node $node_num ($ip) unreachable, skipping"
+            continue
+        fi
+
+        case "$CLUSTER_TYPE" in
+            k3s|armbian)
+                wipe_nvme_ssh "$ip" "$node_num"
+                wipe_emmc_ssh "$ip" "$node_num"
+                ;;
+            talos)
+                wipe_talos_node "$ip" "$node_num"
+                ;;
+            talos-maintenance)
+                log_warn "Node $node_num in maintenance mode - power off and reflash"
+                ;;
+        esac
+    done
+
+    print_section "Full Wipe Complete"
+    log_warn "All storage has been wiped"
+    log_info "Reflash nodes via BMC: tpi flash -n <node> --image-path <image>"
+}
+
+cmd_wipe_talos() {
+    print_header "Wipe Talos Cluster"
+    detect_cluster_type
+
+    if [[ "$CLUSTER_TYPE" != "talos" && "$CLUSTER_TYPE" != "talos-maintenance" ]]; then
+        log_error "No Talos cluster detected (found: $CLUSTER_TYPE)"
+        log_info "Use 'wipe all' or 'wipe nvme/emmc' for non-Talos nodes"
+        exit 1
+    fi
+
+    confirm "This will reset all Talos nodes and destroy cluster state!"
+
+    print_section "Resetting Talos Nodes"
+
+    # Set talosconfig if available
+    if [ -f "$CONFIG_DIR/talosconfig" ]; then
+        export TALOSCONFIG="$CONFIG_DIR/talosconfig"
+    fi
+
+    for i in "${!ALL_NODE_IPS[@]}"; do
+        ip="${ALL_NODE_IPS[$i]}"
+        node_num="${NODE_NUMBERS[$i]}"
+
+        if ! check_reachable "$ip"; then
+            log_warn "Node $node_num ($ip) unreachable, skipping"
+            continue
+        fi
+
+        if [[ "$CLUSTER_TYPE" == "talos-maintenance" ]]; then
+            log_warn "Node $node_num in maintenance mode - will power off for reflash"
+        else
+            wipe_talos_node "$ip" "$node_num"
+        fi
+    done
+
+    print_section "Talos Reset Complete"
+    echo ""
+    echo "To reinstall Talos:"
+    echo "  1. Power off nodes: tpi power off -n <node>"
+    echo "  2. Flash image: tpi flash -n <node> --image-path images/latest/metal-arm64.raw"
+    echo "  3. Deploy: ./scripts/deploy-talos-cluster.sh deploy"
+}
+
+cmd_wipe_k3s() {
+    print_header "Wipe K3s Cluster"
+    detect_cluster_type
+
+    if [[ "$CLUSTER_TYPE" != "k3s" && "$CLUSTER_TYPE" != "armbian" ]]; then
+        log_error "No K3s/Armbian cluster detected (found: $CLUSTER_TYPE)"
+        exit 1
+    fi
+
+    confirm "This will uninstall K3s and optionally wipe storage!"
+
+    print_section "Uninstalling K3s"
+
+    # Uninstall K3s server first
+    if ssh -o ConnectTimeout=5 "$SSH_USER@$CONTROL_PLANE_IP" "test -f /usr/local/bin/k3s-uninstall.sh" 2>/dev/null; then
+        log_info "Uninstalling K3s server on $CONTROL_PLANE_IP..."
+        ssh "$SSH_USER@$CONTROL_PLANE_IP" '/usr/local/bin/k3s-uninstall.sh' 2>/dev/null || true
+        log_success "K3s server uninstalled"
+    fi
+
+    # Uninstall K3s agents
+    for ip in "${WORKER_IPS[@]}"; do
+        if ssh -o ConnectTimeout=5 "$SSH_USER@$ip" "test -f /usr/local/bin/k3s-agent-uninstall.sh" 2>/dev/null; then
+            log_info "Uninstalling K3s agent on $ip..."
+            ssh "$SSH_USER@$ip" '/usr/local/bin/k3s-agent-uninstall.sh' 2>/dev/null || true
+            log_success "K3s agent uninstalled on $ip"
+        fi
+    done
+
+    # Ask about storage wipe
+    echo ""
+    read -r -p "Also wipe NVMe storage (Longhorn data)? (yes/no): " wipe_nvme
     if [[ "$wipe_nvme" == "yes" ]]; then
-        for i in "${!NODE_IPS[@]}"; do
-            node_ip="${NODE_IPS[$i]}"
-            node_num=$((i + 1))
-
-            echo "  Wiping NVMe on node $node_num ($node_ip)..."
-            ssh -o ConnectTimeout=5 "$SSH_USER@$node_ip" \
-                'umount /var/lib/longhorn 2>/dev/null; wipefs -af /dev/nvme0n1 2>/dev/null || true' \
-                2>/dev/null || echo "    Node $node_num unreachable"
+        for i in "${!ALL_NODE_IPS[@]}"; do
+            wipe_nvme_ssh "${ALL_NODE_IPS[$i]}" "${NODE_NUMBERS[$i]}"
         done
     fi
 
+    print_section "K3s Uninstall Complete"
     echo ""
-    print_header "K3s Uninstall Complete"
-    echo "K3s has been removed. To reinstall:"
-    echo "  1. Run setup script: ssh root@<node> 'bash -s' < scripts/setup-k3s-node.sh"
-    echo "  2. Deploy cluster: ./scripts/deploy-k3s-cluster.sh"
+    echo "To reinstall K3s:"
+    echo "  1. Setup nodes: ./scripts/setup-k3s-node.sh"
+    echo "  2. Deploy: ./scripts/deploy-k3s-cluster.sh"
     echo ""
-    echo "See docs/INSTALLATION-K3S.md for full instructions."
+    echo "To switch to Talos:"
+    echo "  1. Wipe eMMC: ./scripts/wipe-cluster.sh emmc"
+    echo "  2. Flash Talos: tpi flash -n <node> --image-path images/latest/metal-arm64.raw"
+    echo "  3. Deploy: ./scripts/deploy-talos-cluster.sh deploy"
 }
 
-# Full node wipe via BMC
-wipe_full() {
-    print_header "Full Node Wipe via BMC"
+cmd_wipe_node() {
+    local node_num=$1
+    local target=${2:-all}
 
+    if [[ -z "$node_num" || ! "$node_num" =~ ^[1-4]$ ]]; then
+        log_error "Invalid node number. Use 1-4."
+        exit 1
+    fi
+
+    local node_idx=$((node_num - 1))
+    local ip="${ALL_NODE_IPS[$node_idx]}"
+
+    print_header "Wipe Node $node_num ($ip)"
+    detect_cluster_type
+
+    if ! check_reachable "$ip"; then
+        log_error "Node $node_num ($ip) is not reachable"
+        exit 1
+    fi
+
+    confirm "This will wipe storage on node $node_num!"
+
+    case "$target" in
+        nvme)
+            if [[ "$CLUSTER_TYPE" == "k3s" || "$CLUSTER_TYPE" == "armbian" ]]; then
+                wipe_nvme_ssh "$ip" "$node_num"
+            else
+                log_error "NVMe wipe via SSH only works on Armbian/K3s nodes"
+                exit 1
+            fi
+            ;;
+        emmc)
+            if [[ "$CLUSTER_TYPE" == "k3s" || "$CLUSTER_TYPE" == "armbian" ]]; then
+                wipe_emmc_ssh "$ip" "$node_num"
+            else
+                log_error "eMMC wipe via SSH only works on Armbian/K3s nodes"
+                exit 1
+            fi
+            ;;
+        all)
+            if [[ "$CLUSTER_TYPE" == "talos" ]]; then
+                wipe_talos_node "$ip" "$node_num"
+            elif [[ "$CLUSTER_TYPE" == "k3s" || "$CLUSTER_TYPE" == "armbian" ]]; then
+                wipe_nvme_ssh "$ip" "$node_num"
+                wipe_emmc_ssh "$ip" "$node_num"
+            else
+                log_error "Cannot wipe node in current state ($CLUSTER_TYPE)"
+                exit 1
+            fi
+            ;;
+        *)
+            log_error "Unknown target: $target (use: nvme, emmc, or all)"
+            exit 1
+            ;;
+    esac
+
+    log_success "Node $node_num wipe complete"
+}
+
+cmd_power_off() {
+    print_header "Power Off All Nodes"
     check_tpi
 
-    print_warning "This will power off all nodes and prepare for reflash!"
-    print_warning "You will need to manually flash new images after this."
-    confirm
+    confirm "This will power off all nodes!"
 
-    # Power off all nodes
-    echo "Powering off all nodes..."
-    for node in "${NODES[@]}"; do
-        echo "  Powering off node $node..."
+    for node in "${NODE_NUMBERS[@]}"; do
+        log_info "Powering off node $node..."
         tpi power off -n "$node" 2>/dev/null || true
         sleep 1
     done
 
+    sleep 3
     echo ""
-    echo "Waiting for nodes to power down..."
-    sleep 5
+    echo "Power status:"
+    tpi power status 2>/dev/null || echo "Unable to query"
 
-    # Verify power state
-    echo ""
-    echo "Current power states:"
-    tpi power status 2>/dev/null || echo "Unable to query power status"
-
-    echo ""
-    print_header "Nodes Powered Off"
-    echo ""
-    echo "To install Talos:"
-    echo "  1. Flash: tpi flash -n <node> --image-path images/latest/metal-arm64.raw"
-    echo "  2. Power on: tpi power on -n <node>"
-    echo "  3. Apply config: talosctl apply-config --insecure --nodes <ip> --file <config>"
-    echo ""
-    echo "To install Armbian + K3s:"
-    echo "  1. Flash Armbian image via TPI or SD card"
-    echo "  2. Power on: tpi power on -n <node>"
-    echo "  3. Run setup: ./scripts/setup-k3s-node.sh"
-    echo "  4. Deploy K3s: ./scripts/deploy-k3s-cluster.sh"
+    log_success "All nodes powered off"
+    log_info "Flash new images with: tpi flash -n <node> --image-path <image>"
 }
 
-# Wipe specific node
-wipe_node() {
-    local node=$1
-    local method=$2
+# =============================================================================
+# Usage
+# =============================================================================
 
-    if [[ -z "$node" || ! "$node" =~ ^[1-4]$ ]]; then
-        print_error "Invalid node number. Use 1-4."
-        exit 1
-    fi
-
-    local node_idx=$((node - 1))
-    local node_ip="${NODE_IPS[$node_idx]}"
-
-    print_header "Wiping Node $node ($node_ip)"
-
-    case "$method" in
-        talos)
-            print_warning "This will reset Talos on node $node!"
-            confirm
-
-            echo "Resetting Talos on node $node..."
-            talosctl --endpoints "$node_ip" --nodes "$node_ip" reset \
-                --graceful=false \
-                --reboot=false \
-                2>/dev/null || echo "Node may already be wiped"
-
-            echo ""
-            echo "Node $node reset. Power off and reflash to continue."
-            ;;
-
-        k3s)
-            print_warning "This will uninstall K3s on node $node!"
-            confirm
-
-            echo "Uninstalling K3s on node $node..."
-            if [[ "$node" == "1" ]]; then
-                ssh "$SSH_USER@$node_ip" '/usr/local/bin/k3s-uninstall.sh 2>/dev/null || true'
-            else
-                ssh "$SSH_USER@$node_ip" '/usr/local/bin/k3s-agent-uninstall.sh 2>/dev/null || true'
-            fi
-
-            echo ""
-            echo "K3s removed from node $node."
-            ;;
-
-        power)
-            check_tpi
-            echo "Powering off node $node..."
-            tpi power off -n "$node"
-            echo "Node $node powered off."
-            ;;
-
-        *)
-            print_error "Unknown method: $method. Use: talos, k3s, or power"
-            exit 1
-            ;;
-    esac
-}
-
-# Show status
-show_status() {
-    print_header "Cluster Status"
-
-    echo "Checking node reachability..."
-    echo ""
-
-    for i in "${!NODE_IPS[@]}"; do
-        node_ip="${NODE_IPS[$i]}"
-        node_num=$((i + 1))
-
-        # Check SSH (Armbian)
-        if ssh -o ConnectTimeout=2 -o BatchMode=yes "$SSH_USER@$node_ip" 'true' 2>/dev/null; then
-            # Check if K3s is installed
-            if ssh "$SSH_USER@$node_ip" 'systemctl is-active k3s k3s-agent 2>/dev/null | grep -q active'; then
-                echo -e "Node $node_num ($node_ip): ${GREEN}Armbian + K3s${NC}"
-            else
-                echo -e "Node $node_num ($node_ip): ${YELLOW}Armbian (no K3s)${NC}"
-            fi
-        # Check Talos API
-        elif talosctl --endpoints "$node_ip" version --short 2>/dev/null | grep -q 'Tag:'; then
-            echo -e "Node $node_num ($node_ip): ${GREEN}Talos${NC}"
-        else
-            echo -e "Node $node_num ($node_ip): ${RED}Unreachable${NC}"
-        fi
-    done
-
-    echo ""
-
-    # Check BMC
-    if ping -c 1 -W 2 "$BMC_IP" &>/dev/null; then
-        echo -e "BMC ($BMC_IP): ${GREEN}Reachable${NC}"
-
-        # Try to get power status
-        if command -v tpi &>/dev/null; then
-            echo ""
-            echo "Power Status:"
-            tpi power status 2>/dev/null || echo "  Unable to query power status"
-        fi
-    else
-        echo -e "BMC ($BMC_IP): ${RED}Unreachable${NC}"
-    fi
-}
-
-# Print usage
 usage() {
-    cat << EOF
+    cat << 'EOF'
 Turing RK1 Cluster Wipe Script
 
-Usage: $0 <command> [options]
+Detects cluster type (Talos/K3s/Armbian) and wipes storage to prepare for
+fresh deployment.
+
+Usage: ./wipe-cluster.sh <command> [options]
 
 Commands:
-  talos           Reset all Talos nodes (graceful)
-  k3s             Uninstall K3s from all Armbian nodes
-  full            Power off all nodes for reflash
-  node <n> <type> Wipe specific node (type: talos|k3s|power)
-  status          Show current cluster status
-  help            Show this help message
+  status              Show cluster type and storage status
+  nvme                Wipe NVMe drives on all nodes
+  emmc                Wipe eMMC drives on all nodes (DANGER!)
+  all                 Wipe both NVMe and eMMC (DANGER!)
+  talos               Reset Talos cluster (graceful wipe)
+  k3s                 Uninstall K3s and optionally wipe storage
+  node <n> [target]   Wipe specific node (target: nvme|emmc|all)
+  power-off           Power off all nodes via BMC
+  help                Show this help message
+
+Storage Targets:
+  nvme    /dev/nvme0n1  - NVMe SSDs (worker data, Longhorn)
+  emmc    /dev/mmcblk0  - eMMC flash (boot drive, OS)
 
 Environment Variables:
-  BMC_IP          BMC IP address (default: 10.10.88.70)
-  BMC_USER        BMC SSH user (default: root)
-  SSH_USER        Node SSH user for Armbian (default: root)
+  BMC_IP      BMC IP address (default: 10.10.88.70)
+  SSH_USER    SSH user for Armbian nodes (default: root)
 
 Examples:
-  $0 talos              # Reset all Talos nodes
-  $0 k3s                # Uninstall K3s from all nodes
-  $0 full               # Power off all nodes
-  $0 node 2 talos       # Reset Talos on node 2 only
-  $0 node 3 k3s         # Uninstall K3s from node 3
-  $0 status             # Check cluster status
+  ./wipe-cluster.sh status           # Check cluster and storage status
+  ./wipe-cluster.sh nvme             # Wipe NVMe on all nodes
+  ./wipe-cluster.sh talos            # Reset Talos cluster
+  ./wipe-cluster.sh k3s              # Uninstall K3s
+  ./wipe-cluster.sh node 2 nvme      # Wipe NVMe on node 2 only
+  ./wipe-cluster.sh all              # Full wipe for OS reinstall
+  ./wipe-cluster.sh power-off        # Power off all nodes
+
+Typical Workflows:
+
+  Switch from K3s to Talos:
+    1. ./wipe-cluster.sh k3s         # Uninstall K3s
+    2. ./wipe-cluster.sh emmc        # Wipe boot drives
+    3. tpi flash -n 1-4 --image-path images/latest/metal-arm64.raw
+    4. ./scripts/deploy-talos-cluster.sh deploy
+
+  Switch from Talos to K3s:
+    1. ./wipe-cluster.sh talos       # Reset Talos
+    2. ./wipe-cluster.sh power-off   # Power off nodes
+    3. tpi flash -n 1-4 --image-path <armbian-image>
+    4. ./scripts/deploy-k3s-cluster.sh
+
+  Fresh Talos reinstall:
+    1. ./wipe-cluster.sh talos       # Reset existing cluster
+    2. ./scripts/deploy-talos-cluster.sh deploy
 
 EOF
 }
 
+# =============================================================================
 # Main
+# =============================================================================
+
 case "${1:-help}" in
+    status)
+        cmd_status
+        ;;
+    nvme)
+        cmd_wipe_nvme
+        ;;
+    emmc)
+        cmd_wipe_emmc
+        ;;
+    all)
+        cmd_wipe_all
+        ;;
     talos)
-        wipe_talos
+        cmd_wipe_talos
         ;;
     k3s)
-        wipe_k3s
-        ;;
-    full)
-        wipe_full
+        cmd_wipe_k3s
         ;;
     node)
-        wipe_node "$2" "$3"
+        cmd_wipe_node "$2" "${3:-all}"
         ;;
-    status)
-        show_status
+    power-off|poweroff)
+        cmd_power_off
         ;;
     help|--help|-h)
         usage
         ;;
     *)
-        print_error "Unknown command: $1"
+        log_error "Unknown command: $1"
+        echo ""
         usage
         exit 1
         ;;

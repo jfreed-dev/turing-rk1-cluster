@@ -4,12 +4,12 @@ This guide documents the complete installation of a 4-node Kubernetes cluster on
 
 ## Automated Deployment (Recommended)
 
-Use the `deploy-cluster.sh` script for automated deployment:
+Use the `deploy-talos-cluster.sh` script for automated deployment:
 
 ```bash
 # From repository root
-./deploy-cluster.sh prereq    # Check prerequisites
-./deploy-cluster.sh deploy    # Full automated deployment
+./scripts/deploy-talos-cluster.sh prereq    # Check prerequisites
+./scripts/deploy-talos-cluster.sh deploy    # Full automated deployment
 ```
 
 ### Available Commands
@@ -32,10 +32,10 @@ Use the `deploy-cluster.sh` script for automated deployment:
 ### Utility Commands
 
 ```bash
-./deploy-cluster.sh power-status  # Check BMC power status
-./deploy-cluster.sh power-on      # Power on all nodes
-./deploy-cluster.sh power-off     # Power off all nodes
-./deploy-cluster.sh uart 1        # View node 1 UART output
+./scripts/deploy-talos-cluster.sh power-status  # Check BMC power status
+./scripts/deploy-talos-cluster.sh power-on      # Power on all nodes
+./scripts/deploy-talos-cluster.sh power-off     # Power off all nodes
+./scripts/deploy-talos-cluster.sh uart 1        # View node 1 UART output
 ```
 
 ### Cluster Status
@@ -43,7 +43,7 @@ Use the `deploy-cluster.sh` script for automated deployment:
 After deployment, check cluster health with:
 
 ```bash
-./cluster-status.sh
+./scripts/talos-cluster-status.sh
 ```
 
 This script auto-detects the cluster type and displays:

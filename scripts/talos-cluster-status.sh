@@ -361,7 +361,7 @@ get_talos_maintenance_status() {
     done
 
     log_info "Nodes are in maintenance mode - not yet configured"
-    log_info "To deploy cluster, run: ./deploy-cluster.sh deploy"
+    log_info "To deploy cluster, run: ./scripts/deploy-talos-cluster.sh deploy"
 }
 
 # =============================================================================

@@ -73,7 +73,7 @@ wait_for_node() {
     while ! ping -c 1 -W 2 "$ip" &>/dev/null; do
         sleep 5
         elapsed=$((elapsed + 5))
-        if [ $elapsed -ge $timeout ]; then
+        if [ "$elapsed" -ge "$timeout" ]; then
             log_error "Timeout waiting for node $ip"
             return 1
         fi
@@ -92,7 +92,7 @@ wait_for_talos_api() {
     while ! talosctl --nodes "$ip" version --insecure &>/dev/null 2>&1; do
         sleep 5
         elapsed=$((elapsed + 5))
-        if [ $elapsed -ge $timeout ]; then
+        if [ "$elapsed" -ge "$timeout" ]; then
             log_error "Timeout waiting for Talos API on $ip"
             return 1
         fi
@@ -201,7 +201,7 @@ check_prerequisites() {
         log_info "Download from https://factory.talos.dev or run: $0 download-image"
         return 1
     fi
-    log_success "Talos image found: $(ls -lh "$TALOS_IMAGE" | awk '{print $5}')"
+    log_success "Talos image found: $(stat -c%s "$TALOS_IMAGE" | awk '{printf "%.1fM", $1/1024/1024}')"
 
     # Create config directory
     mkdir -p "$CONFIG_DIR"

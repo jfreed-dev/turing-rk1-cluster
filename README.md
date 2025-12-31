@@ -23,15 +23,15 @@ See [docs/COMPARISON.md](docs/COMPARISON.md) for detailed feature comparison.
 
 ```bash
 # Talos Linux (automated deployment)
-./deploy-cluster.sh prereq    # Check prerequisites
-./deploy-cluster.sh deploy    # Full deployment
+./scripts/deploy-talos-cluster.sh prereq    # Check prerequisites
+./scripts/deploy-talos-cluster.sh deploy    # Full deployment
 
 # K3s on Armbian
 ./scripts/setup-k3s-node.sh   # Run on each node
 ./scripts/deploy-k3s-cluster.sh  # Deploy from workstation
 
 # Check cluster status (works with both distributions)
-./cluster-status.sh           # Auto-detects and shows health summary
+./scripts/talos-cluster-status.sh           # Auto-detects and shows health summary
 ```
 
 > **Note**: This project is under active development. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
@@ -360,8 +360,6 @@ talosctl health
 turing-rk1-cluster/
 ├── README.md                 # This file
 ├── CLUSTER_PLAN.md           # Deployment planning document
-├── deploy-cluster.sh         # Automated Talos deployment script
-├── cluster-status.sh         # Cluster health and status checker
 ├── talos-schematic.yaml      # Talos image customization
 ├── cluster-config/           # Cluster configurations
 │   ├── talosconfig           # Talos CLI config
@@ -375,6 +373,8 @@ turing-rk1-cluster/
 │   ├── external-scrape-config.yaml # External targets
 │   └── *.yaml                # Other configurations
 ├── scripts/                  # Automation scripts
+│   ├── deploy-talos-cluster.sh # Automated Talos deployment
+│   ├── talos-cluster-status.sh # Cluster health and status checker
 │   ├── setup-k3s-node.sh     # Armbian node preparation
 │   ├── deploy-k3s-cluster.sh # K3s cluster deployment
 │   └── wipe-cluster.sh       # Cluster reset/migration tool
