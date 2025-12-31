@@ -19,6 +19,18 @@ A 4-node bare-metal Kubernetes cluster built on Turing RK1 compute modules, supp
 
 See [docs/COMPARISON.md](docs/COMPARISON.md) for detailed feature comparison.
 
+### Quick Start
+
+```bash
+# Talos Linux (automated deployment)
+./deploy-cluster.sh prereq    # Check prerequisites
+./deploy-cluster.sh deploy    # Full deployment
+
+# K3s on Armbian
+./scripts/setup-k3s-node.sh   # Run on each node
+./scripts/deploy-k3s-cluster.sh  # Deploy from workstation
+```
+
 > **Note**: This project is under active development. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved.
 
 ## Hardware Summary
@@ -345,6 +357,7 @@ talosctl health
 turing-rk1-cluster/
 ├── README.md                 # This file
 ├── CLUSTER_PLAN.md           # Deployment planning document
+├── deploy-cluster.sh         # Automated Talos deployment script
 ├── talos-schematic.yaml      # Talos image customization
 ├── cluster-config/           # Cluster configurations
 │   ├── talosconfig           # Talos CLI config

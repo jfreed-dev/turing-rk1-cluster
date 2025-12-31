@@ -2,6 +2,46 @@
 
 This guide documents the complete installation of a 4-node Kubernetes cluster on Turing RK1 boards using Talos Linux.
 
+## Automated Deployment (Recommended)
+
+Use the `deploy-cluster.sh` script for automated deployment:
+
+```bash
+# From repository root
+./deploy-cluster.sh prereq    # Check prerequisites
+./deploy-cluster.sh deploy    # Full automated deployment
+```
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `prereq` | Check prerequisites (tools, BMC access, image) |
+| `deploy` | Full deployment (all phases) |
+| `download-image` | Download Talos image from factory |
+| `flash` | Flash nodes with Talos image |
+| `boot` | Power on and boot all nodes |
+| `generate` | Generate cluster configurations |
+| `apply` | Apply configurations to nodes |
+| `bootstrap` | Bootstrap Kubernetes cluster |
+| `kubeconfig` | Get kubeconfig for kubectl access |
+| `longhorn` | Install Longhorn storage |
+| `status` | Show cluster status |
+| `reset` | Reset cluster (DESTRUCTIVE!) |
+
+### Utility Commands
+
+```bash
+./deploy-cluster.sh power-status  # Check BMC power status
+./deploy-cluster.sh power-on      # Power on all nodes
+./deploy-cluster.sh power-off     # Power off all nodes
+./deploy-cluster.sh uart 1        # View node 1 UART output
+```
+
+For step-by-step manual installation, continue reading below.
+
+---
+
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)

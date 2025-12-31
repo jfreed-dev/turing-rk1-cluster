@@ -2,6 +2,63 @@
 
 This guide documents an alternative installation using K3s on Armbian, providing a similar 4-node Kubernetes cluster to the Talos setup.
 
+## Automated Deployment
+
+Use the provided scripts for streamlined deployment:
+
+### Step 1: Prepare Each Node
+
+SSH to each node after flashing Armbian and run the setup script:
+
+```bash
+# Copy script to node
+scp scripts/setup-k3s-node.sh root@10.10.88.73:/root/
+
+# SSH and run with hostname
+ssh root@10.10.88.73
+./setup-k3s-node.sh k3s-server
+
+# Repeat for workers with appropriate hostnames:
+# Node 2: ./setup-k3s-node.sh k3s-agent-1
+# Node 3: ./setup-k3s-node.sh k3s-agent-2
+# Node 4: ./setup-k3s-node.sh k3s-agent-3
+```
+
+The setup script:
+- Sets hostname
+- Updates system packages
+- Installs required dependencies (open-iscsi, nfs-common, etc.)
+- Configures kernel modules for K3s
+- Sets up sysctl parameters
+- Enables iSCSI for Longhorn
+- Disables swap
+- Formats and mounts NVMe for Longhorn storage
+
+### Step 2: Deploy K3s Cluster
+
+From your workstation, run the deployment script:
+
+```bash
+./scripts/deploy-k3s-cluster.sh
+```
+
+This script:
+1. Installs K3s server on Node 1 (10.10.88.73)
+2. Retrieves the node token
+3. Installs K3s agents on Nodes 2-4
+4. Downloads kubeconfig to `~/.kube/config-k3s-turing`
+
+### Step 3: Verify Cluster
+
+```bash
+export KUBECONFIG=~/.kube/config-k3s-turing
+kubectl get nodes -o wide
+```
+
+For step-by-step manual installation or customization, continue reading below.
+
+---
+
 ## Table of Contents
 
 1. [Overview](#overview)
