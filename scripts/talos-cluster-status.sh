@@ -9,7 +9,8 @@ set -euo pipefail
 # Configuration
 # =============================================================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_DIR="${SCRIPT_DIR}/cluster-config"
+PROJECT_DIR="${SCRIPT_DIR}/.."
+CONFIG_DIR="${PROJECT_DIR}/cluster-config"
 
 # Node IPs
 CONTROL_PLANE_IP="10.10.88.73"
