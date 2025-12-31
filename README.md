@@ -299,6 +299,30 @@ kubectl get nodes
 talosctl health
 ```
 
+### BMC Access Setup
+
+The deployment scripts require access to the Turing Pi BMC. Configure credentials by copying the example file:
+
+```bash
+cp .env.example .env
+# Edit .env with your BMC credentials
+```
+
+Required variables in `.env`:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `TPI_HOSTNAME` | BMC IP address | `10.10.88.70` |
+| `TPI_USERNAME` | BMC login username | - |
+| `TPI_PASSWORD` | BMC login password | - |
+| `USE_LOCAL_TPI` | Use local tpi CLI (1) or SSH to BMC (0) | `1` |
+
+Test BMC connectivity:
+
+```bash
+./scripts/wipe-cluster.sh status
+```
+
 ---
 
 ## Documentation Map
@@ -360,6 +384,7 @@ talosctl health
 turing-rk1-cluster/
 ├── README.md                 # This file
 ├── CLUSTER_PLAN.md           # Deployment planning document
+├── .env.example              # Environment variables template
 ├── talos-schematic.yaml      # Talos image customization
 ├── cluster-config/           # Cluster configurations
 │   ├── talosconfig           # Talos CLI config
