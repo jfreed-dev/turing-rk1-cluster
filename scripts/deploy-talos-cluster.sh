@@ -9,9 +9,18 @@ set -euo pipefail
 # Configuration
 # =============================================================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="${SCRIPT_DIR}/.."
 CLUSTER_NAME="${CLUSTER_NAME:-turing-cluster}"
-CONFIG_DIR="${SCRIPT_DIR}/cluster-config"
-IMAGE_DIR="${SCRIPT_DIR}/images/latest"
+CONFIG_DIR="${PROJECT_DIR}/cluster-config"
+
+# Load .env file if present
+if [[ -f "${PROJECT_DIR}/.env" ]]; then
+    set -a
+    # shellcheck source=/dev/null
+    source "${PROJECT_DIR}/.env"
+    set +a
+fi
+IMAGE_DIR="${PROJECT_DIR}/images/latest"
 TALOS_IMAGE="${IMAGE_DIR}/metal-arm64.raw"
 TALOS_VERSION="v1.11.6"
 

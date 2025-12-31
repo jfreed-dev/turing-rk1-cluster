@@ -11,7 +11,16 @@ set -euo pipefail
 # Configuration
 # =============================================================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_DIR="${SCRIPT_DIR}/../cluster-config"
+PROJECT_DIR="${SCRIPT_DIR}/.."
+CONFIG_DIR="${PROJECT_DIR}/cluster-config"
+
+# Load .env file if present
+if [[ -f "${PROJECT_DIR}/.env" ]]; then
+    set -a
+    # shellcheck source=/dev/null
+    source "${PROJECT_DIR}/.env"
+    set +a
+fi
 
 # BMC Configuration
 BMC_IP="${BMC_IP:-10.10.88.70}"
