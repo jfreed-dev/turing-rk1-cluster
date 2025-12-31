@@ -108,26 +108,26 @@ detect_cluster_type() {
 
     for ip in "${ALL_NODE_IPS[@]}"; do
         if check_reachable "$ip"; then
-            ((reachable_nodes++))
+            ((++reachable_nodes))
 
             # Check for Talos API
             if talosctl --nodes "$ip" version &>/dev/null 2>&1; then
-                ((talos_nodes++))
+                ((++talos_nodes))
                 continue
             fi
 
             # Check for Talos maintenance mode (port 50000)
             if nc -zw2 "$ip" 50000 &>/dev/null 2>&1; then
-                ((maintenance_nodes++))
+                ((++maintenance_nodes))
                 continue
             fi
 
             # Check for SSH access
             if ssh -o ConnectTimeout=3 -o BatchMode=yes "$SSH_USER@$ip" "echo ok" &>/dev/null 2>&1; then
-                ((ssh_nodes++))
+                ((++ssh_nodes))
                 # Check if K3s is installed
                 if ssh -o ConnectTimeout=3 -o BatchMode=yes "$SSH_USER@$ip" "which k3s" &>/dev/null 2>&1; then
-                    ((k3s_nodes++))
+                    ((++k3s_nodes))
                 fi
             fi
         fi
@@ -194,7 +194,7 @@ detect_node_storage() {
             fi
         " 2>/dev/null || echo "    Could not detect storage"
     elif [[ "$method" == "talos" ]]; then
-        talosctl --nodes "$ip" disks 2>/dev/null | grep -E "(nvme|mmcblk)" | sed 's/^/    /' || echo "    Could not detect storage"
+        talosctl --nodes "$ip" get disks 2>/dev/null | grep -E "(nvme|mmcblk)" | sed 's/^/    /' || echo "    Could not detect storage"
     fi
 }
 
